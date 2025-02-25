@@ -1,14 +1,9 @@
 import './App.css'
+import Board from "./components/Board.tsx"
 
 function App() {
   return <div className='game'>
-    {[
-      [0, 1, 2, 3, "M"],
-      [0, 1, 2, 3, "M"],
-      [0, 1, 2, 3, "M"]
-      ].map((row) => (
-        <div>{row.map((cell) => cell)}</div>
-      ))}
+    <Board/>
   </div>
 }
 

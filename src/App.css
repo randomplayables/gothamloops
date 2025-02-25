@@ -10,3 +10,55 @@
   background-color: var(--surface);
   border-radius: 1rem;
 }
+
+.row {
+  display: flex
+}
+
+.cell {
+  --cell-size: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: calc(var(--cell-size) * .75);
+  font-weight: 700;
+  width: var(--cell-size);
+  height: var(--cell-size);
+  border: solid 1px var(--cell-border-color);
+  user-select: none;
+  cursor: default;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.cell.one {
+  color: var(--one);
+}
+
+.cell.two {
+  color: var(--two);
+}
+
+.cell.three {
+  color: var(--three);
+}
+
+.cell.four {
+  color: var(--four);
+}
+
+.cell.five {
+  color: var(--five);
+}
+
+.cell.six {
+  color: var(--six);
+}
+
+.cell.seven {
+  color: var(--seven);
+}
+
+.cell.eight {
+  color: var(--eight);
+}

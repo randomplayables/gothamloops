@@ -6,6 +6,15 @@
   --app-bg: #151515;
   --text: #1a1a1a;
   --surface: #ccc;
+  --cell-border-color: #bbb;
+  --one: blue;
+  --two: green;
+  --three: tomato;
+  --four: darkviolet;
+  --five: darkred;
+  --six: steelblue;
+  --seven: black;
+  --eight: black;
 
   background-color: var(--app-bg);
   color: var(--text);
