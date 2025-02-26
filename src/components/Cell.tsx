@@ -7,7 +7,9 @@ const Cell = ({cell}) => {
     )}
     >
         {typeof cell.value === "number" && <> {cell.value || "" }</> }
-        </div> 
+        {cell.value === "mine" && <>.</>}
+        {!cell.isOpened && <div className="overlay"></div>}
+        </div>
         )
 }
 
