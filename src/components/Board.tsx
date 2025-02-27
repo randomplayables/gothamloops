@@ -2,7 +2,7 @@ import { TBoard } from "../types"
 import {initGame} from "../utils"
 import Cell from "./Cell"
 
-const BOARD: TBoard = initGame(3, 3, 0.5)
+const BOARD: TBoard = initGame(9, 9, 0.8)
 
 // const Board: TBoard = [
 //   [{value: "."}, {value: "."}, {value: "."}, {value: "."}],

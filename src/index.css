@@ -17,6 +17,7 @@
   --eight: black;
   --isopen: green;
   --wasopen: blue;
+  --ishome: tomato;
 
   background-color: var(--app-bg);
   color: var(--text);

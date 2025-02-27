@@ -10,6 +10,7 @@ const Cell = ({cell}) => {
         {cell.value === "mine" && <>.</>}
         {cell.isOpen && <div className="isO"></div>}
         {cell.wasOpen && <div className="wasO"></div>}
+        {cell.isHome && <div className="home"></div>}
         </div>
         )
 }

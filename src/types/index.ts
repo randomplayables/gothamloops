@@ -3,6 +3,7 @@ type PresentCell = {
     isOpen: boolean
     round: number
     p: number
+    isHome: boolean
 }
 
 type PastCell = {
@@ -10,6 +11,7 @@ type PastCell = {
     wasOpen: boolean[]
     round: number[]
     p: number[]
+    isHome: boolean
 }
 
 export type GameCell =  PresentCell | PastCell
