@@ -15,7 +15,8 @@
   --six: steelblue;
   --seven: black;
   --eight: black;
-  --overlay: green;
+  --isopen: green;
+  --wasopen: blue;
 
   background-color: var(--app-bg);
   color: var(--text);

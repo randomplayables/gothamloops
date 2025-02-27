@@ -8,7 +8,8 @@ const Cell = ({cell}) => {
     >
         {typeof cell.value === "number" && <> {cell.value || "" }</> }
         {cell.value === "mine" && <>.</>}
-        {!cell.isOpened && <div className="overlay"></div>}
+        {cell.isOpen && <div className="isO"></div>}
+        {cell.wasOpen && <div className="wasO"></div>}
         </div>
         )
 }
