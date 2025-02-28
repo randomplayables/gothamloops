@@ -82,9 +82,13 @@ const fillBoardWithPs = (emptyBoard: TBoard, rows: number, cols: number, p: numb
 
 export const initBoard = (rows: number, cols: number, p: number) => {
     const emptyBoard = createBoard(rows, cols)
-    const boardWithPs = fillBoardWithPs(emptyBoard, rows, cols, p)
+    // const boardWithPs = fillBoardWithPs(emptyBoard, rows, cols, p)
 
-    return boardWithPs
+    // return boardWithPs
+
+    const gameBoard = fillBoardWithPs(emptyBoard, rows, cols, p)
+
+    return gameBoard
 }
 
 export const initGame = (rows: number, cols: number, p: number) => {

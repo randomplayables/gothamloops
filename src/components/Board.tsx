@@ -1,19 +1,16 @@
 import { TBoard } from "../types"
-import {initGame} from "../utils"
 import Cell from "./Cell"
 
-const BOARD: TBoard = initGame(9, 9, 0.8)
+type Props = {
+  gameBoard: TBoard
+}
 
-// const Board: TBoard = [
-//   [{value: "."}, {value: "."}, {value: "."}, {value: "."}],
-//   [{value: "."}, {value: ".", isOpen: true}, {value: "."}, {value: "."}],
-//   [{value: ".", wasOpen: true}, {value: "."}, {value: "."}, {value: "."}]
-//   ]
+const Board = (props: Props) => {
+  const {gameBoard} = props
 
-const Board = () => {
     return(
         <div className="board">
-        {BOARD.map((row) => (
+        {gameBoard.map((row) => (
               <div className="row">{row.map((cell) => (
                 <Cell cell = {cell}/> 
               ))}</div>
