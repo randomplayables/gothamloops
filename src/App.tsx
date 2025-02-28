@@ -4,9 +4,9 @@ import useGothamLoopsGame from './hooks/useGothamLoopsGame.tsx'
 
 function App() {
 
-  const {gameBoard} = useGothamLoopsGame()
+  const {gameBoard, handleCellLeftClick} = useGothamLoopsGame()
   return <div className='game'>
-    <Board gameBoard={gameBoard}/>
+    <Board gameBoard={gameBoard} handleCellLeftClick={handleCellLeftClick}/>
   </div>
 }
 
