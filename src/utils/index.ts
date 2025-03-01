@@ -8,11 +8,11 @@ const createBoard = (rows: number, cols: number) => {
 
         for (let cellIndex = 0; cellIndex < cols; cellIndex++){
             board[rowIndex][cellIndex] = {
-                value: ".",
                 isOpen: false,
                 round: 1,
                 p: 0.5,
-                isHome: false
+                isHome: false,
+                place: false
             }
         }
     }
@@ -23,6 +23,8 @@ const createBoard = (rows: number, cols: number) => {
     
     // Set the center cell as the home cell
     board[centerRowIndex][centerCellIndex].isHome = true;
+    board[centerRowIndex][centerCellIndex].place = true;
+    
 
     return board
 }
@@ -82,10 +84,6 @@ const fillBoardWithPs = (emptyBoard: TBoard, rows: number, cols: number, p: numb
 
 export const initBoard = (rows: number, cols: number, p: number) => {
     const emptyBoard = createBoard(rows, cols)
-    // const boardWithPs = fillBoardWithPs(emptyBoard, rows, cols, p)
-
-    // return boardWithPs
-
     const gameBoard = fillBoardWithPs(emptyBoard, rows, cols, p)
 
     return gameBoard

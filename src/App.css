@@ -31,13 +31,13 @@
   box-sizing: border-box;
 }
 
-.cell::after {
+/* .cell::after {
   content: ".";
   position: absolute;
   top: 25%;
   left: 50%;
   transform: translate(-50%, -50%);
-}
+} */
 
 .cell.one {
   color: var(--one);
@@ -105,4 +105,28 @@
   border-left-color: var(--ishome);
   border-right-color: var(--ishome);
   border-bottom-color: var(--ishome);
+}
+
+.cell.on-place {
+  position: relative;
+}
+
+.on-place::after {
+  content: "*";
+  position: absolute;
+  top: 65%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.cell.empty-cell {
+  position: relative;
+}
+
+.empty-cell::after {
+  content: ".";
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }

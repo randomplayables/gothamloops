@@ -1,5 +1,3 @@
-import clsx from "clsx"
-import { CELL_NUMBERS_COLORS } from "../constants"
 import { GameCell } from "../types"
 
 type  CellProps = {
@@ -10,16 +8,16 @@ type  CellProps = {
 }
 
 const Cell = ({cell, rowIndex, cellIndex, handleCellLeftClick}: CellProps) => {
-    return( <div className={clsx("cell", typeof cell.value === 'number' && CELL_NUMBERS_COLORS[cell.value]
-
-    )}
-    onClick={() => handleCellLeftClick(rowIndex, cellIndex)}
+    return(
+    <div
+        className="cell"
+        onClick={() => handleCellLeftClick(rowIndex, cellIndex)}
     >
-        {typeof cell.value === "number" && <> {cell.value || "" }</> }
-        {cell.value === "mine" && <>.</>}
         {cell.isOpen && <div className="isO"></div>}
         {cell.wasOpen && <div className="wasO"></div>}
         {cell.isHome && <div className="home"></div>}
+        {!cell.place && <div className="empty-cell"></div>}
+        {cell.place && <div className="on-place"></div>}
         </div>
         )
 }
