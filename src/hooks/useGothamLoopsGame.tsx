@@ -63,20 +63,6 @@ const useGothamLoopsGame = () => {
         // We can now safely calculate the score if it's a PresentCell
         const moveScore = cell.isHome ? 0 : (isPresentCell ? 1 / (cell.p as number) : 0);
 
-        // Update round history
-        // setRoundHistory((prev) => ({
-        //     step: prev.step + 1,
-        //     placeCell: [...prev.placeCell, { row, cell: col }],
-        //     p: [...prev.p, cell.p],
-        //     score: [...prev.score, moveScore],
-        // }));
-        // setRoundHistory((prev) => ({
-        //     step: prev.step + 1,
-        //     placeCell: [...prev.placeCell, { row, cell: col }], // Use 'cell' instead of 'col'
-        //     p: [...prev.p, cell.p],
-        //     score: [...prev.score, moveScore],
-        // }));
-        // 
         // // Update round history
         setRoundHistory((prev) => ({
             step: prev.step + 1,
