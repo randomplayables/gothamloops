@@ -3,7 +3,10 @@ import { initGame } from "../utils"
 import { TBoard, TrackRound } from "../types";
 
 const useGothamLoopsGame = () => {
+
+
     const [gameBoard, setGameBoard] = useState(initGame(9, 9, 0.8))
+    const [isRoundOver, setIsRoundOver] = useState(false)
     
     // Track the current position for faster lookup
     const [currentPosition, setCurrentPosition] = useState(() => {
@@ -46,6 +49,11 @@ const useGothamLoopsGame = () => {
             console.log("Illegal move - you can only move to adjacent cells")
             return null // Return null to indicate invalid move
         }
+
+        if (isRoundOver){
+            console.log("The round is over")
+            return null // Return null to indicate invalid move
+        }
         
         // Update the place status on the board
         newGameBoard[currentRow][currentCol].place = false // Remove place from previous position
@@ -75,10 +83,23 @@ const useGothamLoopsGame = () => {
         console.log("roundHistory: ", roundHistory)
 
         if (cell.isHome) {
+            if (roundHistory.step > 0 && cell.isHome === true){
+                setIsRoundOver(true)
+            }
             console.log("This is your home")
         } else {
+
+        let rvalue: number = Math.random() 
+        if (rvalue > (cell.p as number)){
+            console.log("rvalue: ", rvalue)
+            console.log("cell.p: ", cell.p)
+            setIsRoundOver(true)
+
+        }
             console.log("You're out walking")
         }
+
+        console.log("isRoundOver: ", isRoundOver)
 
         return newGameBoard
     }
