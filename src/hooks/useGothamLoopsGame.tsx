@@ -107,7 +107,9 @@ const useGothamLoopsGame = () => {
     }
 
     const handleCellLeftClick = (row: number, col: number) => {
-        // console.log("left click: ", row, col)
+
+        if (isRoundOver) return null
+
         const newGameBoard: TBoard = JSON.parse(JSON.stringify(gameBoard))
 
         const boardAfterOpeningCell = openCell(newGameBoard, row, col)
