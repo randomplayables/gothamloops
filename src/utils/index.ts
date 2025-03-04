@@ -12,7 +12,8 @@ const createBoard = (rows: number, cols: number) => {
                 round: 1,
                 p: 0.5,
                 isHome: false,
-                place: false
+                place: false,
+                highlight: null
             }
         }
     }

@@ -85,6 +85,7 @@ const useGothamLoopsGame = () => {
         if (cell.isHome) {
             if (roundHistory.step > 0 && cell.isHome === true){
                 setIsRoundOver(true)
+                cell.highlight = "green"
             }
             console.log("This is your home")
         } else {
@@ -94,6 +95,7 @@ const useGothamLoopsGame = () => {
             console.log("rvalue: ", rvalue)
             console.log("cell.p: ", cell.p)
             setIsRoundOver(true)
+            cell.highlight = "red"
 
         }
             console.log("You're out walking")

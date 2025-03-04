@@ -15,9 +15,11 @@
   --six: steelblue;
   --seven: black;
   --eight: black;
-  --isopen: green;
+  --isopen: steelblue;
   --wasopen: blue;
   --ishome: tomato;
+  --red: firebrick;
+  --green: green;
 
   background-color: var(--app-bg);
   color: var(--text);

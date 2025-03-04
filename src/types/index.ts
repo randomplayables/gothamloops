@@ -4,14 +4,16 @@ type PresentCell = {
     p: number
     isHome: boolean
     place: boolean
+    highlight?: "red" | "green" | null
 }
 
 type PastCell = {
-    wasOpen: boolean[]
+    isOpen: boolean[] //In earlier drafts this was wasOpen
     round: number[]
     p: number[]
     isHome: boolean
     place: boolean[]
+    highlight?: string[]
 }
 
 export type TrackRound = {

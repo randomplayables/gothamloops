@@ -13,11 +13,13 @@ const Cell = ({cell, rowIndex, cellIndex, handleCellLeftClick}: CellProps) => {
         className="cell"
         onClick={() => handleCellLeftClick(rowIndex, cellIndex)}
     >
-        {cell.isOpen && <div className="isO"></div>}
-        {cell.wasOpen && <div className="wasO"></div>}
-        {cell.isHome && <div className="home"></div>}
+        {cell.isOpen && cell.highlight === null &&  <div className="isO"></div>}
+        {/* {cell.wasOpen && <div className="wasO"></div>}  */}
+        {cell.isHome && cell.highlight !== "green" && <div className="home"></div>}
         {!cell.place && <div className="empty-cell"></div>}
         {cell.place && <div className="on-place"></div>}
+        {cell.highlight === "red" && <div className="red"></div>}
+        {cell.highlight === "green" && <div className="green"></div>}
         </div>
         )
 }
