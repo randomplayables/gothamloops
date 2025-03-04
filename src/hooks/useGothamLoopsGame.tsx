@@ -1,11 +1,27 @@
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import { initGame } from "../utils"
-import { TBoard, TrackRound } from "../types";
+import { TBoard, TrackRound, TLevel } from "../types";
+import { DEFAULT_LEVEL, LEVELS } from "../constants";
 
 const useGothamLoopsGame = () => {
 
 
-    const [gameBoard, setGameBoard] = useState(initGame(9, 9, 0.8))
+    const [level, setLevel] = useState(DEFAULT_LEVEL)
+    const currentLevel = LEVELS[level]
+
+    const changeLevel = useCallback((selectedLevel: TLevel) => {
+        setLevel(selectedLevel)
+    }, [])
+
+    const [gameBoard, setGameBoard] = useState(
+        initGame(
+            LEVELS[DEFAULT_LEVEL].rows,
+            LEVELS[DEFAULT_LEVEL].cols,
+            LEVELS[DEFAULT_LEVEL].p,
+            LEVELS[DEFAULT_LEVEL].decay
+        )
+    )
+
     const [isRoundOver, setIsRoundOver] = useState(false)
     
     // Track the current position for faster lookup
@@ -119,7 +135,7 @@ const useGothamLoopsGame = () => {
         }  
     }
 
-    return{gameBoard, handleCellLeftClick, roundHistory}
+    return{level, changeLevel, gameBoard, handleCellLeftClick, roundHistory}
 }
 
 export default useGothamLoopsGame

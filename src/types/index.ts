@@ -1,3 +1,5 @@
+import { LEVELS } from "../constants"
+
 type PresentCell = {
     isOpen: boolean
     round: number
@@ -27,3 +29,4 @@ export type GameCell =  PresentCell | PastCell
 
 export type TBoard = GameCell[][]
 
+export type TLevel = keyof typeof LEVELS

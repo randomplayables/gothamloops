@@ -30,14 +30,14 @@ const createBoard = (rows: number, cols: number) => {
     return board
 }
 
-const fillBoardWithPs = (emptyBoard: TBoard, rows: number, cols: number, p: number) => {
+const fillBoardWithPs = (emptyBoard: TBoard, rows: number, cols: number, p: number, decay: number) => {
     // Find the home cell (which should be at the center)
     const centerRowIndex = Math.floor(rows / 2);
     const centerCellIndex = Math.floor(cols / 2);
     
     // Set decay factor (how quickly probability decreases with distance)
     // Can be adjusted based on desired difficulty level
-    const decayFactor = 0.2; 
+    const decayFactor = decay; 
     
     // Update probabilities for all cells
     for (let rowIndex = 0; rowIndex < rows; rowIndex++) {
@@ -83,13 +83,13 @@ const fillBoardWithPs = (emptyBoard: TBoard, rows: number, cols: number, p: numb
     return emptyBoard;
 }
 
-export const initBoard = (rows: number, cols: number, p: number) => {
+export const initBoard = (rows: number, cols: number, p: number, decay: number) => {
     const emptyBoard = createBoard(rows, cols)
-    const gameBoard = fillBoardWithPs(emptyBoard, rows, cols, p)
+    const gameBoard = fillBoardWithPs(emptyBoard, rows, cols, p, decay)
 
     return gameBoard
 }
 
-export const initGame = (rows: number, cols: number, p: number) => {
-    return initBoard(rows, cols, p)
+export const initGame = (rows: number, cols: number, p: number, decay: number) => {
+    return initBoard(rows, cols, p, decay)
 }
