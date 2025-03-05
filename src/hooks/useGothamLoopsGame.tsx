@@ -24,6 +24,7 @@ const useGothamLoopsGame = () => {
 
     const resetBoard = useCallback(() => {
         setIsRoundOver(false)
+        setRoundScore(0)
         setRoundHistory(() => ({
             step: 0,
             placeCell: [],
@@ -70,6 +71,9 @@ const useGothamLoopsGame = () => {
         score: []
     });
     
+    // Add a state for round score
+    const [roundScore, setRoundScore] = useState(0);
+
     // Check if a move is legal (adjacent to current position)
     const isLegalMove = (fromRow: number, fromCol: number, toRow: number, toCol: number) => {
         const rowDiff = Math.abs(fromRow - toRow)
@@ -126,6 +130,13 @@ const useGothamLoopsGame = () => {
         console.log("cell: ", cell)
         console.log("roundHistory: ", roundHistory)
 
+        // Calculate the new round score and update state
+        const newRoundScore = [...roundHistory.score, moveScore].reduce(
+            (accumulator, currentValue) => accumulator + currentValue, 
+            0
+        );
+        setRoundScore(newRoundScore);
+        
         if (cell.isHome) {
             if (roundHistory.step > 0 && cell.isHome === true){
                 setIsRoundOver(true)
@@ -163,7 +174,7 @@ const useGothamLoopsGame = () => {
         }  
     }
 
-    return{level, changeLevel, gameBoard, handleCellLeftClick, roundHistory, isRoundOver}
+    return{level, changeLevel, gameBoard, handleCellLeftClick, roundHistory, isRoundOver, roundScore}
 }
 
 export default useGothamLoopsGame
