@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { initGame } from "../utils"
 import { TBoard, TrackRound, TLevel } from "../types";
 import { DEFAULT_LEVEL, LEVELS } from "../constants";
@@ -21,6 +21,34 @@ const useGothamLoopsGame = () => {
             LEVELS[DEFAULT_LEVEL].decay
         )
     )
+
+    const resetBoard = useCallback(() => {
+        setIsRoundOver(false)
+        setRoundHistory(() => ({
+            step: 0,
+            placeCell: [],
+            p: [],
+            score: []
+        }));
+
+        // Important: Reset the current position to the home (center) position of the new board
+        const centerRow = Math.floor(currentLevel.rows / 2);
+        const centerCol = Math.floor(currentLevel.cols / 2);
+        setCurrentPosition({ row: centerRow, col: centerCol });
+
+        setGameBoard(
+            initGame(currentLevel.rows, currentLevel.cols, currentLevel.p, currentLevel.decay)
+        )
+
+    }, [currentLevel])
+
+    const startNewGame = useCallback(() => {
+        resetBoard()
+    }, [resetBoard])
+
+    useEffect(() => {
+        startNewGame()
+    }, [level, startNewGame])
 
     const [isRoundOver, setIsRoundOver] = useState(false)
     
@@ -127,15 +155,15 @@ const useGothamLoopsGame = () => {
         if (isRoundOver) return null
 
         const newGameBoard: TBoard = JSON.parse(JSON.stringify(gameBoard))
-
         const boardAfterOpeningCell = openCell(newGameBoard, row, col)
+        
 
         if (boardAfterOpeningCell){
             setGameBoard(boardAfterOpeningCell)
         }  
     }
 
-    return{level, changeLevel, gameBoard, handleCellLeftClick, roundHistory}
+    return{level, changeLevel, gameBoard, handleCellLeftClick, roundHistory, isRoundOver}
 }
 
 export default useGothamLoopsGame

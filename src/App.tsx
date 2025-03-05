@@ -7,7 +7,7 @@ function App() {
 
   const {level, changeLevel, gameBoard, handleCellLeftClick} = useGothamLoopsGame()
   return <div className='game'>
-    <Board gameBoard={gameBoard} handleCellLeftClick={handleCellLeftClick}/>
+    <Board level={level} gameBoard={gameBoard} handleCellLeftClick={handleCellLeftClick}/>
     <SelectLevel level={level} changeLevel = {changeLevel}/>
   </div>
 }

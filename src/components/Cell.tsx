@@ -1,17 +1,22 @@
-import { GameCell } from "../types"
+import clsx from "clsx"
+import { GameCell, TLevel } from "../types"
 
 type  CellProps = {
     cell: GameCell
     rowIndex: number
     cellIndex: number
     handleCellLeftClick: (row: number, col: number) => void
+    level: TLevel
 }
 
-const Cell = ({cell, rowIndex, cellIndex, handleCellLeftClick}: CellProps) => {
+const Cell = ({cell, rowIndex, cellIndex, handleCellLeftClick, level}: CellProps) => {
     return(
     <div
-        className="cell"
-        onClick={() => handleCellLeftClick(rowIndex, cellIndex)}
+        className={clsx(
+            "cell",
+            level !== "easy" && "small"
+        )}
+            onClick={() => handleCellLeftClick(rowIndex, cellIndex)}
     >
         {cell.isOpen && cell.highlight === null &&  <div className="isO"></div>}
         {/* {cell.wasOpen && <div className="wasO"></div>}  */}
