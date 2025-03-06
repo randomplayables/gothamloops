@@ -12,12 +12,33 @@ function App() {
     gameBoard,
     handleCellLeftClick,
     isRoundOver,
-    roundScore} = useGothamLoopsGame()
-  return <div className='game'>
-    <Header isRoundOver={isRoundOver} roundScore={roundScore}/>
-    <Board level={level} gameBoard={gameBoard} handleCellLeftClick={handleCellLeftClick}/>
-    <SelectLevel level={level} changeLevel = {changeLevel}/>
-  </div>
+    roundScore,
+    round,
+    handleStartNewRound} = useGothamLoopsGame()
+  // return <div className='game'>
+  //   <Header isRoundOver={isRoundOver} roundScore={roundScore}/>
+  //   <Board level={level} gameBoard={gameBoard} handleCellLeftClick={handleCellLeftClick}/>
+  //   <SelectLevel level={level} changeLevel = {changeLevel}/>
+  // </div>
+  return (
+    <div className='game'>
+      <Header 
+        isRoundOver={isRoundOver} 
+        roundScore={roundScore} 
+        round={round}
+        onStartNewRound={handleStartNewRound}
+      />
+      <Board 
+        level={level} 
+        gameBoard={gameBoard} 
+        handleCellLeftClick={handleCellLeftClick}
+      />
+      <SelectLevel 
+        level={level} 
+        changeLevel={changeLevel}
+      />
+    </div>
+  )
 }
 
 export default App

@@ -214,3 +214,58 @@ header {
   font-size: 1rem;
   white-space: nowrap;
 }
+
+.win {
+  color: var(--round-green)
+}
+
+.round-over {
+  color: var(--round-red)
+}
+
+.header-icon {
+  width: 1rem;
+  height: 1rem
+}
+
+.header-label {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem
+}
+
+/* Round display styling */
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+.round-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.round-counter {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.new-round-button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.new-round-button:hover {
+  background-color: #45a049;
+}

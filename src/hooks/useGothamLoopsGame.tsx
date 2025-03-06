@@ -2,8 +2,11 @@ import { useCallback, useEffect, useState } from "react"
 import { initGame } from "../utils"
 import { TBoard, TrackRound, TLevel } from "../types";
 import { DEFAULT_LEVEL, LEVELS } from "../constants";
+import useRound from "./useRound";
 
 const useGothamLoopsGame = () => {
+    // Use the round hook
+    const { round, incrementRound, resetRound } = useRound();
 
 
     const [level, setLevel] = useState(DEFAULT_LEVEL)
@@ -11,7 +14,8 @@ const useGothamLoopsGame = () => {
 
     const changeLevel = useCallback((selectedLevel: TLevel) => {
         setLevel(selectedLevel)
-    }, [])
+        resetRound() // Reset round counter when level changes
+    }, [resetRound])
 
     const [gameBoard, setGameBoard] = useState(
         initGame(
@@ -45,7 +49,13 @@ const useGothamLoopsGame = () => {
 
     const startNewGame = useCallback(() => {
         resetBoard()
-    }, [resetBoard])
+        resetRound() // Reset round counter for new game
+    }, [resetBoard, resetRound])
+
+    const startNewRound = useCallback(() => {
+        resetBoard()
+        incrementRound() // Increment round counter for new round
+    }, [resetBoard, incrementRound])
 
     useEffect(() => {
         startNewGame()
@@ -174,7 +184,14 @@ const useGothamLoopsGame = () => {
         }  
     }
 
-    return{level, changeLevel, gameBoard, handleCellLeftClick, roundHistory, isRoundOver, roundScore}
+    // Function to handle starting a new round (for UI to call)
+    const handleStartNewRound = () => {
+        if (isRoundOver) {
+            startNewRound()
+        }
+    }
+
+    return{level, changeLevel, gameBoard, handleCellLeftClick, roundHistory, isRoundOver, roundScore, round, handleStartNewRound}
 }
 
 export default useGothamLoopsGame
