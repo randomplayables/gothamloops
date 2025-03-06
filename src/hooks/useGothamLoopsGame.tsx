@@ -1,21 +1,18 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useState, useRef } from "react"
 import { initGame } from "../utils"
 import { TBoard, TrackRound, TLevel } from "../types";
 import { DEFAULT_LEVEL, LEVELS } from "../constants";
-import useRound from "./useRound";
+import useRound from "./useRound"; // Import the useRound hook
 
 const useGothamLoopsGame = () => {
-    // Use the round hook
+    // Use the round hook with memoized functions
     const { round, incrementRound, resetRound } = useRound();
-
 
     const [level, setLevel] = useState(DEFAULT_LEVEL)
     const currentLevel = LEVELS[level]
-
-    const changeLevel = useCallback((selectedLevel: TLevel) => {
-        setLevel(selectedLevel)
-        resetRound() // Reset round counter when level changes
-    }, [resetRound])
+    
+    // Track if this is the initial mount
+    const isInitialMount = useRef(true);
 
     const [gameBoard, setGameBoard] = useState(
         initGame(
@@ -25,16 +22,35 @@ const useGothamLoopsGame = () => {
             LEVELS[DEFAULT_LEVEL].decay
         )
     )
+    
+    const [isRoundOver, setIsRoundOver] = useState(false)
+    const [roundScore, setRoundScore] = useState(0)
+    const [roundHistory, setRoundHistory] = useState<TrackRound>({
+        step: 0,
+        placeCell: [],
+        p: [],
+        score: []
+    });
+    
+    // Track the current position for faster lookup
+    const [currentPosition, setCurrentPosition] = useState(() => {
+        // Initialize by finding the home position
+        const rows = gameBoard.length
+        const cols = gameBoard[0].length
+        const centerRow = Math.floor(rows / 2)
+        const centerCol = Math.floor(cols / 2)
+        return { row: centerRow, col: centerCol }
+    })
 
     const resetBoard = useCallback(() => {
         setIsRoundOver(false)
         setRoundScore(0)
-        setRoundHistory(() => ({
+        setRoundHistory({
             step: 0,
             placeCell: [],
             p: [],
             score: []
-        }));
+        });
 
         // Important: Reset the current position to the home (center) position of the new board
         const centerRow = Math.floor(currentLevel.rows / 2);
@@ -44,7 +60,6 @@ const useGothamLoopsGame = () => {
         setGameBoard(
             initGame(currentLevel.rows, currentLevel.cols, currentLevel.p, currentLevel.decay)
         )
-
     }, [currentLevel])
 
     const startNewGame = useCallback(() => {
@@ -56,33 +71,21 @@ const useGothamLoopsGame = () => {
         resetBoard()
         incrementRound() // Increment round counter for new round
     }, [resetBoard, incrementRound])
+    
+    const changeLevel = useCallback((selectedLevel: TLevel) => {
+        setLevel(selectedLevel)
+        // We'll handle reset in the useEffect
+    }, [])
 
     useEffect(() => {
-        startNewGame()
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            startNewGame();
+        } else if (level !== DEFAULT_LEVEL) {
+            // Only run when level changes, not on initial mount
+            startNewGame();
+        }
     }, [level, startNewGame])
-
-    const [isRoundOver, setIsRoundOver] = useState(false)
-    
-    // Track the current position for faster lookup
-    const [currentPosition, setCurrentPosition] = useState(() => {
-        // Initialize by finding the home position
-        const rows = gameBoard.length
-        const cols = gameBoard[0].length
-        const centerRow = Math.floor(rows / 2)
-        const centerCol = Math.floor(cols / 2)
-        return { row: centerRow, col: centerCol }
-    })
-    
-    // New state for tracking round moves using the TrackRound type
-    const [roundHistory, setRoundHistory] = useState<TrackRound>({
-        step: 0,
-        placeCell: [],
-        p: [],
-        score: []
-    });
-    
-    // Add a state for round score
-    const [roundScore, setRoundScore] = useState(0);
 
     // Check if a move is legal (adjacent to current position)
     const isLegalMove = (fromRow: number, fromCol: number, toRow: number, toCol: number) => {
@@ -91,10 +94,9 @@ const useGothamLoopsGame = () => {
         return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1)
     }
     
-    const openCell = (board: TBoard, row: number, col: number) => {
-        
+    const openCell = useCallback((board: TBoard, row: number, col: number) => {
         // Make a deep copy so that we don't mutate the original board
-        const newGameBoard: TBoard = JSON.parse(JSON.stringify(gameBoard))
+        const newGameBoard: TBoard = JSON.parse(JSON.stringify(board))
         const cell = newGameBoard[row][col]
         
         // Get the current place position
@@ -137,15 +139,10 @@ const useGothamLoopsGame = () => {
             score: [...prev.score, moveScore],
         }));
 
-        console.log("cell: ", cell)
-        console.log("roundHistory: ", roundHistory)
-
         // Calculate the new round score and update state
-        const newRoundScore = [...roundHistory.score, moveScore].reduce(
-            (accumulator, currentValue) => accumulator + currentValue, 
-            0
-        );
-        setRoundScore(newRoundScore);
+        setRoundScore(prev => {
+            return prev + moveScore;
+        });
         
         if (cell.isHome) {
             if (roundHistory.step > 0 && cell.isHome === true){
@@ -154,44 +151,48 @@ const useGothamLoopsGame = () => {
             }
             console.log("This is your home")
         } else {
-
-        let rvalue: number = Math.random() 
-        if (rvalue > (cell.p as number)){
-            console.log("rvalue: ", rvalue)
-            console.log("cell.p: ", cell.p)
-            setIsRoundOver(true)
-            cell.highlight = "red"
-
-        }
+            let rvalue: number = Math.random() 
+            if (rvalue > (cell.p as number)){
+                console.log("rvalue: ", rvalue)
+                console.log("cell.p: ", cell.p)
+                setIsRoundOver(true)
+                cell.highlight = "red"
+            }
             console.log("You're out walking")
         }
 
-        console.log("isRoundOver: ", isRoundOver)
-
         return newGameBoard
-    }
+    }, [currentPosition, isRoundOver, roundHistory.step])
 
-    const handleCellLeftClick = (row: number, col: number) => {
-
+    const handleCellLeftClick = useCallback((row: number, col: number) => {
         if (isRoundOver) return null
 
         const newGameBoard: TBoard = JSON.parse(JSON.stringify(gameBoard))
         const boardAfterOpeningCell = openCell(newGameBoard, row, col)
         
-
         if (boardAfterOpeningCell){
             setGameBoard(boardAfterOpeningCell)
         }  
-    }
+    }, [isRoundOver, gameBoard, openCell])
 
     // Function to handle starting a new round (for UI to call)
-    const handleStartNewRound = () => {
+    const handleStartNewRound = useCallback(() => {
         if (isRoundOver) {
             startNewRound()
         }
-    }
+    }, [isRoundOver, startNewRound])
 
-    return{level, changeLevel, gameBoard, handleCellLeftClick, roundHistory, isRoundOver, roundScore, round, handleStartNewRound}
+    return {
+        level, 
+        changeLevel, 
+        gameBoard, 
+        handleCellLeftClick, 
+        roundHistory, 
+        isRoundOver, 
+        roundScore,
+        round,
+        handleStartNewRound
+    }
 }
 
 export default useGothamLoopsGame
