@@ -7,14 +7,6 @@
   --text: #1a1a1a;
   --surface: #ccc;
   --cell-border-color: #bbb;
-  --one: blue;
-  --two: green;
-  --three: tomato;
-  --four: darkviolet;
-  --five: darkred;
-  --six: steelblue;
-  --seven: black;
-  --eight: black;
   --isopen: steelblue;
   --wasopen: blue;
   --ishome: tomato;
@@ -24,10 +16,6 @@
   --btn-color: #151515;
   --btn-active: #555;
   
-
-
-
-
   background-color: var(--app-bg);
   color: var(--text);
 
