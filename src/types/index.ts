@@ -25,6 +25,14 @@ export type TrackRound = {
     score: number[]
 }
 
+export type MultiRoundTrack = {
+    rounds: {
+        roundNumber: number;
+        roundHistory: TrackRound;
+        finalScore: number;
+    }[];
+};
+
 export type GameCell =  PresentCell | PastCell
 
 export type TBoard = GameCell[][]
