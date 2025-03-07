@@ -52,7 +52,7 @@ const useGothamLoopsGame = () => {
             score: []
         });
 
-        // Important: Reset the current position to the home (center) position of the new board
+        // Reset the current position to the home (center) position of the new board
         const centerRow = Math.floor(currentLevel.rows / 2);
         const centerCol = Math.floor(currentLevel.cols / 2);
         setCurrentPosition({ row: centerRow, col: centerCol });
@@ -157,6 +157,7 @@ const useGothamLoopsGame = () => {
                 console.log("cell.p: ", cell.p)
                 setIsRoundOver(true)
                 cell.highlight = "red"
+                setRoundScore(0)
             }
             console.log("You're out walking")
         }

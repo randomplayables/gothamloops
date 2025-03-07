@@ -26,7 +26,6 @@ const createBoard = (rows: number, cols: number) => {
     board[centerRowIndex][centerCellIndex].isHome = true;
     board[centerRowIndex][centerCellIndex].place = true;
     
-
     return board
 }
 
