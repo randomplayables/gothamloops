@@ -24,13 +24,6 @@ const Header = (props: HeaderProps) => {
             />
         </header>
     )
-
-    // return <header>
-    //     <GameStatus
-    //     isRoundOver={isRoundOver}
-    //     roundScore={roundScore}/>
-    //     <RoundDisplay/>
-    // </header>
 }
 
 export default Header
