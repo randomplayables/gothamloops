@@ -8,13 +8,8 @@ const GameStatus = (props: GameStatusProps) => {
     const scoreLabel = isRoundOver ? "Final Round Score:" : "Running Round Score:"
 
     return(
-    // <>
-    // {isRoundOver && <span>Round Over</span>}
-    // <span>Round Score: {roundScore}</span>
-    // {roundScore}
-    // </>
     <div className="game-status">
-    <span>{scoreLabel} {roundScore}</span>
+        <span>{scoreLabel} {roundScore.toFixed(2)}</span>
     </div>
     )
 
