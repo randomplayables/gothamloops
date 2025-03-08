@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, useRef } from "react"
 import { initGame } from "../utils"
-import { TBoard, TrackRound, TLevel } from "../types";
+import { TBoard, TrackRound, TLevel, PastCell, MultiRoundTrack } from "../types";
 import { DEFAULT_LEVEL, LEVELS } from "../constants";
 import useRound from "./useRound"; // Import the useRound hook
 
@@ -62,20 +62,163 @@ const useGothamLoopsGame = () => {
         )
     }, [currentLevel])
 
+    // const startNewGame = useCallback(() => {
+    //     resetBoard()
+    //     resetRound() // Reset round counter for new game
+    // }, [resetBoard, resetRound])
     const startNewGame = useCallback(() => {
-        resetBoard()
-        resetRound() // Reset round counter for new game
-    }, [resetBoard, resetRound])
+        resetBoard();
+        resetRound(); // Reset round counter for new game
+        
+        // Reset multi-round track
+        setMultiRoundTrack({
+            rounds: []
+        });
+        
+        // Reset pastCells
+        setPastCells(() => {
+            const rows = currentLevel.rows;
+            const cols = currentLevel.cols;
+            const cells: PastCell[][] = [];
+            for (let i = 0; i < rows; i++) {
+                cells[i] = [];
+                for (let j = 0; j < cols; j++) {
+                    cells[i][j] = {
+                        isOpen: [],
+                        round: [],
+                        p: [],
+                        isHome: i === Math.floor(rows / 2) && j === Math.floor(cols / 2),
+                        place: [],
+                        highlight: []
+                    };
+                }
+            }
+            return cells;
+        });
+    }, [resetBoard, resetRound, currentLevel]);
 
-    const startNewRound = useCallback(() => {
-        resetBoard()
-        incrementRound() // Increment round counter for new round
-    }, [resetBoard, incrementRound])
+    // Track past cell states across rounds
+    const [pastCells, setPastCells] = useState<PastCell[][]>(() => {
+        // Initialize with empty arrays for each cell
+        const rows = LEVELS[DEFAULT_LEVEL].rows;
+        const cols = LEVELS[DEFAULT_LEVEL].cols;
+        const cells: PastCell[][] = [];
+        for (let i = 0; i < rows; i++) {
+            cells[i] = [];
+            for (let j = 0; j < cols; j++) {
+                cells[i][j] = {
+                    isOpen: [],
+                    round: [],
+                    p: [],
+                    isHome: i === Math.floor(rows / 2) && j === Math.floor(cols / 2),
+                    place: [],
+                    highlight: []
+                };                }
+        }    
+        return cells;
+    });
     
+    // Track round data across multiple rounds
+    const [multiRoundTrack, setMultiRoundTrack] = useState<MultiRoundTrack>({
+        rounds: []
+    });
+
+    // const startNewRound = useCallback(() => {
+    //     resetBoard()
+    //     incrementRound() // Increment round counter for new round
+    // }, [resetBoard, incrementRound])
+
+    // Update the startNewRound function to save current round data:
+    const startNewRound = useCallback(() => {
+        // Save the current round's history in the multi-round track
+        // setMultiRoundTrack(prev => ({
+        //     rounds: [
+        //         ...prev.rounds,
+        //         {
+        //             roundNumber: round,
+        //             roundHistory: { ...roundHistory },
+        //             finalScore: roundScore
+        //         }
+        //     ]
+        // }
+
+        // The commented out version of setMultiRoundTrack  above should be used in production
+        // The version below is for understanding how function is behaving in development
+        setMultiRoundTrack(prev => {
+            const updatedTrack = {
+                rounds: [
+                    ...prev.rounds,
+                    {
+                        roundNumber: round,
+                        roundHistory: { ...roundHistory },
+                        finalScore: roundScore
+                    }
+                ]
+            };
+            
+            console.log('Multi-round data updated:', updatedTrack);
+            return updatedTrack;
+        });
+
+        
+    // ));
+
+    // Save all cell states for this round in PastCell format
+    setPastCells(prev => {
+        const newPastCells = [...prev];
+        for (let i = 0; i < gameBoard.length; i++) {
+            for (let j = 0; j < gameBoard[i].length; j++) {
+                const cell = gameBoard[i][j];
+                if ('isOpen' in cell) { // Check if it's a PresentCell
+                    newPastCells[i][j].isOpen.push(cell.isOpen as boolean);
+                    newPastCells[i][j].round.push(cell.round as number);
+                    newPastCells[i][j].p.push(cell.p as number);
+                    newPastCells[i][j].place.push(cell.place as boolean);
+                    if (cell.highlight) {
+                        newPastCells[i][j].highlight?.push(cell.highlight as "red" | "green");
+                    } else {
+                        newPastCells[i][j].highlight?.push('null');
+                    }
+                }
+            }
+        }
+        return newPastCells;
+    });
+    
+    resetBoard();
+    incrementRound();
+    }, [resetBoard, incrementRound, round, roundHistory, roundScore, gameBoard]);
+
+
+    // const changeLevel = useCallback((selectedLevel: TLevel) => {
+    //     setLevel(selectedLevel)
+    //     // We'll handle reset in the useEffect
+    // }, [])
+
     const changeLevel = useCallback((selectedLevel: TLevel) => {
-        setLevel(selectedLevel)
-        // We'll handle reset in the useEffect
-    }, [])
+        setLevel(selectedLevel);
+        // Reset pastCells when the level changes
+        setPastCells(() => {
+            const rows = LEVELS[selectedLevel].rows;
+            const cols = LEVELS[selectedLevel].cols;
+            const cells: PastCell[][] = [];
+            for (let i = 0; i < rows; i++) {
+                cells[i] = [];
+                for (let j = 0; j < cols; j++) {
+                    cells[i][j] = {
+                        isOpen: [],
+                        round: [],
+                        p: [],
+                        isHome: i === Math.floor(rows / 2) && j === Math.floor(cols / 2),
+                        place: [],
+                        highlight: []
+                    };
+                }
+            }
+            return cells;
+        });
+        // We'll handle the rest of the reset in the useEffect
+    }, []);
 
     useEffect(() => {
         if (isInitialMount.current) {
@@ -148,6 +291,7 @@ const useGothamLoopsGame = () => {
             if (roundHistory.step > 0 && cell.isHome === true){
                 setIsRoundOver(true)
                 cell.highlight = "green"
+                console.log(`See pastCells object:`, pastCells);
             }
             console.log("This is your home")
         } else {
@@ -158,6 +302,7 @@ const useGothamLoopsGame = () => {
                 setIsRoundOver(true)
                 cell.highlight = "red"
                 setRoundScore(0)
+                console.log(`See pastCells object:`, pastCells);
             }
             console.log("You're out walking")
         }
@@ -192,7 +337,9 @@ const useGothamLoopsGame = () => {
         isRoundOver, 
         roundScore,
         round,
-        handleStartNewRound
+        handleStartNewRound,
+        pastCells,
+        multiRoundTrack
     }
 }
 

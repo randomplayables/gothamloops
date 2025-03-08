@@ -9,7 +9,7 @@ type PresentCell = {
     highlight?: "red" | "green" | null
 }
 
-type PastCell = {
+export type PastCell = {
     isOpen: boolean[] //In earlier drafts this was wasOpen
     round: number[]
     p: number[]
