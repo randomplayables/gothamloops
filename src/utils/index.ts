@@ -52,7 +52,10 @@ const fillBoardWithPs = (emptyBoard: TBoard, rows: number, cols: number, p: numb
                 cellP = 1.0;
             } else {
                 // Calculate probability based on exponential decay
-                cellP = p * Math.exp(-distance * decayFactor);
+                // cellP = p * Math.exp(-distance * decayFactor);
+
+                // Calculate probability based on geometric decay
+                cellP = p * Math.pow(decayFactor, distance);
                 
                 // Ensure minimum probability of 0.1
                 cellP = Math.max(cellP, 0.1);
