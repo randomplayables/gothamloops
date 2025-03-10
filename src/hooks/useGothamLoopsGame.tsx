@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, useRef } from "react"
-import { initGame } from "../utils"
+import { initGame, updateProbabilitiesFromPastVisits  } from "../utils"
 import { TBoard, TrackRound, TLevel, PastCell, MultiRoundTrack } from "../types";
 import { DEFAULT_LEVEL, LEVELS } from "../constants";
 import useRound from "./useRound"; // Import the useRound hook
@@ -121,50 +121,82 @@ const useGothamLoopsGame = () => {
 
     // Update the startNewRound function to save current round data:
     const startNewRound = useCallback(() => {
-        // Save the current round's history in the multi-round track
-        setMultiRoundTrack(prev => {
-            const updatedTrack = {
-                rounds: [
-                    ...prev.rounds,
-                    {
-                        roundNumber: round,
-                        roundHistory: { ...roundHistory },
-                        finalScore: roundScore
-                    }
-                ]
-            };
-            
-            console.log('Multi-round data updated:', updatedTrack);
-            return updatedTrack;
-        });
-
-    // Save all cell states for this round in PastCell format
-    setPastCells(prev => {
-        const newPastCells = [...prev];
+        // 1) Increment the round right away, so round is about to become (oldRound + 1).
+        incrementRound();
+      
+        // 2) Build a fresh copy of `pastCells` from the current gameBoard
+        const newPastCells = structuredClone(pastCells);
         for (let i = 0; i < gameBoard.length; i++) {
-            for (let j = 0; j < gameBoard[i].length; j++) {
-                const cell = gameBoard[i][j];
-                if ('isOpen' in cell) { // Check if it's a PresentCell
-                    newPastCells[i][j].isOpen.push(cell.isOpen as boolean);
-                    newPastCells[i][j].round.push(cell.round as number);
-                    newPastCells[i][j].p.push(cell.p as number);
-                    newPastCells[i][j].place.push(cell.place as boolean);
-                    if (cell.highlight) {
-                        newPastCells[i][j].highlight?.push(cell.highlight as "red" | "green");
-                    } else {
-                        newPastCells[i][j].highlight?.push('null');
-                    }
-                }
+          for (let j = 0; j < gameBoard[i].length; j++) {
+            const cell = gameBoard[i][j];
+            if ("isOpen" in cell) {
+              newPastCells[i][j].isOpen.push(cell.isOpen as boolean);
+              newPastCells[i][j].round.push(cell.round as number);
+              newPastCells[i][j].p.push(cell.p as number);
+              newPastCells[i][j].place.push(cell.place as boolean);
+              newPastCells[i][j].highlight?.push(cell.highlight as "red" | "green");
             }
+          }
         }
-        console.log(`See pastCells object:`, newPastCells);
-        return newPastCells;
-    });
-    
-    resetBoard();
-    incrementRound();
-    }, [resetBoard, incrementRound, round, roundHistory, roundScore, gameBoard]);
-
+        console.log("Updated pastCells:", newPastCells);
+      
+        // 3) Build the new multiRoundTrack entry
+        const newMultiRoundTrack = structuredClone(multiRoundTrack);
+        newMultiRoundTrack.rounds.push({
+          roundNumber: round,           // This is the *old* round number just completed
+          roundHistory: { ...roundHistory },
+          finalScore: roundScore
+        });
+        console.log("Updated multiRoundTrack:", newMultiRoundTrack);
+      
+        // 4) Now actually set the updated states for pastCells and multiRoundTrack
+        setPastCells(newPastCells);
+        setMultiRoundTrack(newMultiRoundTrack);
+      
+        // 5) Create a fresh board for the new round
+        const newBoard = initGame(
+          currentLevel.rows,
+          currentLevel.cols,
+          currentLevel.p,
+          currentLevel.decay
+        );
+      
+        // 6) Apply updated probabilities using the *newPastCells* local variable
+        const updatedBoard = updateProbabilitiesFromPastVisits(
+          newBoard,
+          newPastCells,       // Pass the local variable, not the (stale) state
+          0.05,               // Familiarity
+          0.025,              // Neighbor effect
+          0.6                 // Decay factor
+        );
+        setGameBoard(updatedBoard);
+      
+        // 7) Reset round-related state
+        setIsRoundOver(false);
+        setRoundScore(0);
+        setRoundHistory({
+          step: 0,
+          placeCell: [],
+          p: [],
+          score: []
+        });
+      
+        // 8) Reset the player’s position to the home cell
+        const centerRow = Math.floor(currentLevel.rows / 2);
+        const centerCol = Math.floor(currentLevel.cols / 2);
+        setCurrentPosition({ row: centerRow, col: centerCol });
+      
+      }, [
+        round,
+        incrementRound,
+        currentLevel,
+        gameBoard,
+        pastCells,
+        multiRoundTrack,
+        roundHistory,
+        roundScore
+      ]);
+      
     const changeLevel = useCallback((selectedLevel: TLevel) => {
         setLevel(selectedLevel);
         // Reset pastCells when the level changes
