@@ -278,8 +278,11 @@ const useGothamLoopsGame = () => {
         // Update the place status on the board
         newGameBoard[currentRow][currentCol].place = false // Remove place from previous position
         newGameBoard[row][col].place = true // Set place at new position
-        newGameBoard[row][col].isOpen = true // Open the new cell
-        
+        // Check if this cell has already been visited in this round
+        const cellAlreadyVisitedThisRound = newGameBoard[row][col].isOpen  
+        // Always mark the cell as open      
+        newGameBoard[row][col].isOpen = true 
+
         // Update current position
         setCurrentPosition({ row, col })
         
@@ -289,7 +292,8 @@ const useGothamLoopsGame = () => {
         const isPresentCell = typeof cell.round === 'number';
         
         // We can now safely calculate the score if it's a PresentCell
-        const moveScore = cell.isHome ? 0 : (isPresentCell ? 1 / (cell.p as number) : 0);
+        const moveScore = cell.isHome ? 0 : 
+        (isPresentCell && !cellAlreadyVisitedThisRound ? (1 / (cell.p as number)**((Math.PI**Math.E)/1.5)) : 0);
 
         // // Update round history
         setRoundHistory((prev) => ({
