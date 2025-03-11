@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState, useRef } from "react"
 import { initGame, updateProbabilitiesFromPastVisits  } from "../utils"
 import { TBoard, TrackRound, TLevel, PastCell, MultiRoundTrack } from "../types";
 import { DEFAULT_LEVEL, LEVELS } from "../constants";
-import useRound from "./useRound"; // Import the useRound hook
+import useRound from "./useRound"; 
 
 const useGothamLoopsGame = () => {
     // Use the round hook with memoized functions
@@ -41,6 +41,9 @@ const useGothamLoopsGame = () => {
         const centerCol = Math.floor(cols / 2)
         return { row: centerRow, col: centerCol }
     })
+
+    const [isGameOver, setIsGameOver] = useState(false);
+    const [finalTotalScore, setFinalTotalScore] = useState(0);
 
     const resetBoard = useCallback(() => {
         setIsRoundOver(false)
@@ -121,6 +124,18 @@ const useGothamLoopsGame = () => {
 
     // Update the startNewRound function to save current round data:
     const startNewRound = useCallback(() => {
+        
+        // Check if we're about to exceed 7 rounds
+        if (round >= 7) {
+            // Calculate final total score from multiRoundTrack
+            const totalScore = multiRoundTrack.rounds.reduce((sum, roundData) => 
+            sum + roundData.finalScore, 0) + roundScore;
+            
+            setFinalTotalScore(totalScore);
+            setIsGameOver(true);
+            return; // Don't start a new round
+        }
+
         // 1) Increment the round right away, so round is about to become (oldRound + 1).
         incrementRound();
       
@@ -339,7 +354,9 @@ const useGothamLoopsGame = () => {
         round,
         handleStartNewRound,
         pastCells,
-        multiRoundTrack
+        multiRoundTrack,
+        isGameOver,
+        finalTotalScore
     }
 }
 
