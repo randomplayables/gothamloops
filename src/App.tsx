@@ -14,6 +14,7 @@ function App() {
     handleCellLeftClick,
     isRoundOver,
     roundScore,
+    totalScore,
     round,
     handleStartNewRound,
     isGameOver,
@@ -31,6 +32,7 @@ function App() {
           <Header 
             isRoundOver={isRoundOver} 
             roundScore={roundScore} 
+            totalScore={totalScore}
             round={round}
             onStartNewRound={handleStartNewRound}
           />

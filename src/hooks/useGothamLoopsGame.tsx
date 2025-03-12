@@ -25,6 +25,7 @@ const useGothamLoopsGame = () => {
     
     const [isRoundOver, setIsRoundOver] = useState(false)
     const [roundScore, setRoundScore] = useState(0)
+    const [totalScore, setTotalScore] = useState(0)
     const [roundHistory, setRoundHistory] = useState<TrackRound>({
         step: 0,
         placeCell: [],
@@ -134,6 +135,11 @@ const useGothamLoopsGame = () => {
             setFinalTotalScore(totalScore);
             setIsGameOver(true);
             return; // Don't start a new round
+        }
+
+        // Add the current round score to the total score if the round wasn't lost
+        if (roundScore > 0) {
+            setTotalScore(prevTotal => prevTotal + roundScore);
         }
 
         // 1) Increment the round right away, so round is about to become (oldRound + 1).
@@ -355,6 +361,7 @@ const useGothamLoopsGame = () => {
         roundHistory, 
         isRoundOver, 
         roundScore,
+        totalScore,
         round,
         handleStartNewRound,
         pastCells,
