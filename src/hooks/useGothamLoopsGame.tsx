@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, useRef } from "react"
-import { initGame, updateProbabilitiesFromPastVisits  } from "../utils"
+import { initGame, updateProbabilitiesFromPastVisits, calculateMoveScore } from "../utils"
 import { TBoard, TrackRound, TLevel, PastCell, MultiRoundTrack } from "../types";
 import { DEFAULT_LEVEL, LEVELS } from "../constants";
 import useRound from "./useRound"; 
@@ -256,7 +256,7 @@ const useGothamLoopsGame = () => {
         const colDiff = Math.abs(fromCol - toCol)
         return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1)
     }
-    
+
     const openCell = useCallback((board: TBoard, row: number, col: number) => {
         // Make a deep copy so that we don't mutate the original board
         const newGameBoard: TBoard = JSON.parse(JSON.stringify(board))
@@ -272,7 +272,7 @@ const useGothamLoopsGame = () => {
             console.log("Illegal move - you can only move to adjacent cells")
             return null // Return null to indicate invalid move
         }
-
+    
         if (isRoundOver){
             console.log("The round is over")
             return null // Return null to indicate invalid move
@@ -281,31 +281,37 @@ const useGothamLoopsGame = () => {
         // Update the place status on the board
         newGameBoard[currentRow][currentCol].place = false // Remove place from previous position
         newGameBoard[row][col].place = true // Set place at new position
+        
         // Check if this cell has already been visited in this round
         const cellAlreadyVisitedThisRound = newGameBoard[row][col].isOpen  
+        
         // Always mark the cell as open      
         newGameBoard[row][col].isOpen = true 
-
+    
         // Update current position
         setCurrentPosition({ row, col })
         
-        // Calculate the score for this move:
-        // Type guard to check if we're dealing with a PresentCell
-        // 'round' is a number in PresentCell but number[] in PastCell
-        const isPresentCell = typeof cell.round === 'number';
-        
-        // We can now safely calculate the score if it's a PresentCell
-        const moveScore = cell.isHome ? 0 : 
-        (isPresentCell && !cellAlreadyVisitedThisRound ? (1 / (cell.p as number)**((Math.PI**Math.E)/1.5)) : 0);
-
-        // // Update round history
+        // Calculate the score for this move - only score if not already visited in this round
+        let moveScore = 0;
+        if (!cellAlreadyVisitedThisRound) {
+            moveScore = calculateMoveScore(
+                row, 
+                col, 
+                cell.isHome, 
+                pastCells, 
+                currentLevel.rows, 
+                currentLevel.cols
+            );
+        }
+    
+        // Update round history
         setRoundHistory((prev) => ({
             step: prev.step + 1,
             placeCell: [...prev.placeCell, { row, cell: col }],
-            p: [...prev.p, isPresentCell ? (cell.p as number) : 0], // Type assertion with a check
+            p: [...prev.p, typeof cell.p === 'number' ? cell.p : 0],
             score: [...prev.score, moveScore],
         }));
-
+    
         // Calculate the new round score and update state
         setRoundScore(prev => {
             return prev + moveScore;
@@ -328,9 +334,9 @@ const useGothamLoopsGame = () => {
             }
             console.log("You're out walking")
         }
-
+    
         return newGameBoard
-    }, [currentPosition, isRoundOver, roundHistory.step])
+    }, [currentPosition, isRoundOver, roundHistory.step, pastCells, currentLevel.rows, currentLevel.cols])
 
     const handleCellLeftClick = useCallback((row: number, col: number) => {
         if (isRoundOver) return null

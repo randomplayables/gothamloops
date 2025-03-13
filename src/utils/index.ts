@@ -103,29 +103,67 @@ export const updateProbabilitiesFromPastVisits = (
   // Calculate maxsteps (maximum distance from any corner to home)
   const maxsteps = centerRowIndex + centerCellIndex;
   
-  // Calculate extra flips for each cell based on past visits
-  const extraFlips: number[][] = Array(rows).fill(0).map(() => Array(cols).fill(0));
-  
-  // For each cell that was visited in past rounds
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-      // Count how many times this cell was visited
-      const visitCount = pastCells[i][j].isOpen.filter(Boolean).length;
+  // // Calculate extra flips for each cell based on past visits
+  // const extraFlips: number[][] = Array(rows).fill(0).map(() => Array(cols).fill(0));
+  // Create a map to track which rounds each cell has "extra flips" from
+  // Using Sets to ensure we only count each round once
+  const extraFlipsFromRounds: Set<number>[][] = Array(rows)
+    .fill(null)
+    .map(() => Array(cols)
+      .fill(null)
+      .map(() => new Set<number>())
+    );
+
+  // Determine how many past rounds we have data for
+  const numPastRounds = pastCells[0][0].isOpen.length;
+    
+  // // For each cell that was visited in past rounds
+  // for (let i = 0; i < rows; i++) {
+  //   for (let j = 0; j < cols; j++) {
+  //     // Count how many times this cell was visited
+  //     const visitCount = pastCells[i][j].isOpen.filter(Boolean).length;
       
-      if (visitCount > 0) {
-        // For each cell on the board, calculate the extra flips based on distance
-        for (let r = 0; r < rows; r++) {
-          for (let c = 0; c < cols; c++) {
-            // Skip the home cell - it should always remain at maximum probability
-            if (gameBoard[r][c].isHome) continue;
+  //     if (visitCount > 0) {
+  //       // For each cell on the board, calculate the extra flips based on distance
+  //       for (let r = 0; r < rows; r++) {
+  //         for (let c = 0; c < cols; c++) {
+  //           // Skip the home cell - it should always remain at maximum probability
+  //           if (gameBoard[r][c].isHome) continue;
             
-            // Calculate Manhattan distance from the visited cell
-            const distance = Math.abs(r - i) + Math.abs(c - j);
+  //           // Calculate Manhattan distance from the visited cell
+  //           const distance = Math.abs(r - i) + Math.abs(c - j);
             
-            // Calculate extra flips based on distance
-            if (distance === 0 || distance === 1) {
-              // This is the visited cell itself and the neighboring cell - add 1 extra flip per visit
-              extraFlips[r][c] += visitCount;
+  //           // Calculate extra flips based on distance
+  //           if (distance === 0 || distance === 1) {
+  //             // This is the visited cell itself and the neighboring cell - add 1 extra flip per visit
+  //             extraFlips[r][c] += visitCount;
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
+
+  // For each past round (0-indexed, so round 1 is index 0)
+  for (let round = 0; round < numPastRounds; round++) {
+    // For each cell
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) {
+        // Check if this cell was visited in this round
+        if (pastCells[i][j].isOpen[round]) {
+          // For each cell on the board at distance 0 or 1, add this round
+          for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+              // Skip the home cell
+              if (gameBoard[r][c].isHome) continue;
+              
+              // Calculate Manhattan distance
+              const distance = Math.abs(r - i) + Math.abs(c - j);
+              
+              // If this cell is itself or a neighboring cell, add this round
+              if (distance === 0 || distance === 1) {
+                extraFlipsFromRounds[r][c].add(round);
+              }
             }
           }
         }
@@ -142,13 +180,14 @@ export const updateProbabilitiesFromPastVisits = (
       // Calculate the base stepdistance and flips
       const stepdistance = Math.abs(r - centerRowIndex) + Math.abs(c - centerCellIndex);
       const baseFlips = Math.max(1, maxsteps - stepdistance);
+
+      // Add the extra flips from unique past rounds
+      const totalFlips = baseFlips + extraFlipsFromRounds[r][c].size;
       
-      // Add the extra flips from past visits (rounded to nearest whole flip)
-      const totalFlips = baseFlips + Math.round(extraFlips[r][c]);
+      // // Add the extra flips from past visits (rounded to nearest whole flip)
+      // const totalFlips = baseFlips + Math.round(extraFlips[r][c]);
       
       // Calculate new probability using the coin-flipping model
-      // P(success) = 1 - P(all tails) = 1 - 0.5^totalFlips
-      // let newP = 1 - Math.pow(0.25, totalFlips);
       let newP = calculateCellProbability(totalFlips, numCoins)
       
       // Apply the same scaling factor as the original cell probability
@@ -169,3 +208,35 @@ export const updateProbabilitiesFromPastVisits = (
   
   return updatedBoard;
 }
+
+export const calculateMoveScore = (
+  row: number, 
+  col: number, 
+  isHome: boolean,
+  pastCells: PastCell[][], 
+  boardRows: number, 
+  boardCols: number
+): number => {
+  // If it's the home cell, score is 0
+  if (isHome) {
+    return 0;
+  }
+  
+  // Calculate Manhattan distance from home (center of board)
+  const centerRow = Math.floor(boardRows / 2);
+  const centerCol = Math.floor(boardCols / 2);
+  const distanceFromHome = Math.abs(row - centerRow) + Math.abs(col - centerCol);
+  
+  // Base score is directly proportional to distance from home
+  let score = distanceFromHome;
+  
+  // Check if cell was visited in any previous round
+  const wasVisitedPreviously = pastCells[row][col].isOpen.some(Boolean);
+  
+  // Apply penalty for previously visited cells
+  if (wasVisitedPreviously) {
+    score = Math.max(0, score - 1); // Subtract 1, but don't go below 0
+  }
+  
+  return score;
+};
