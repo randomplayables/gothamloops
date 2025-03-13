@@ -29,17 +29,22 @@ const createBoard = (rows: number, cols: number) => {
     return board
 }
 
-export const initBoard = (rows: number, cols: number) => {
+export const initBoard = (rows: number, cols: number, numCoins: number) => {
     const emptyBoard = createBoard(rows, cols)
-    const gameBoard = fillBoardWithPs(emptyBoard, rows, cols)
+    const gameBoard = fillBoardWithPs(emptyBoard, rows, cols, numCoins)
     return gameBoard
 }
 
-export const initGame = (rows: number, cols: number) => {
-    return initBoard(rows, cols)
+export const initGame = (rows: number, cols: number, numCoins: number) => {
+    return initBoard(rows, cols, numCoins)
 }
 
-const fillBoardWithPs = (emptyBoard: TBoard, rows: number, cols: number) => {
+const calculateCellProbability = (flips: number, numCoins: number) => {
+  const failurePerTrial = 1 - Math.pow(0.5, numCoins);
+  return 1 - Math.pow(failurePerTrial, flips);
+}
+
+const fillBoardWithPs = (emptyBoard: TBoard, rows: number, cols: number, numCoins: number) => {
   // Find the home cell (which should be at the center)
   const centerRowIndex = Math.floor(rows / 2);
   const centerCellIndex = Math.floor(cols / 2);
@@ -67,14 +72,15 @@ const fillBoardWithPs = (emptyBoard: TBoard, rows: number, cols: number) => {
               
               // Probability of getting at least one heads in 'flips' tries
               // P(success) = 1 - P(all tails) = 1 - 0.5^flips
-              cellP = 1 - Math.pow(0.5, flips);
+              // cellP = 1 - Math.pow(0.25, flips);
+              cellP = calculateCellProbability(flips, numCoins)
               
               // Ensure minimum probability of 0.1
               cellP = Math.max(cellP, 0.1);
           }
           
           // Update cell probability
-          emptyBoard[rowIndex][cellIndex].p = cellP;
+          emptyBoard[rowIndex][cellIndex].p = (cellP as number);
       }
   }
   return emptyBoard;
@@ -83,6 +89,7 @@ const fillBoardWithPs = (emptyBoard: TBoard, rows: number, cols: number) => {
 export const updateProbabilitiesFromPastVisits = (
   gameBoard: TBoard,
   pastCells: PastCell[][],
+  numCoins: number
 ): TBoard => {
   // Make a deep copy of the game board to avoid mutations
   const updatedBoard: TBoard = JSON.parse(JSON.stringify(gameBoard));
@@ -141,11 +148,13 @@ export const updateProbabilitiesFromPastVisits = (
       
       // Calculate new probability using the coin-flipping model
       // P(success) = 1 - P(all tails) = 1 - 0.5^totalFlips
-      let newP = 1 - Math.pow(0.5, totalFlips);
+      // let newP = 1 - Math.pow(0.25, totalFlips);
+      let newP = calculateCellProbability(totalFlips, numCoins)
       
       // Apply the same scaling factor as the original cell probability
       const originalP = gameBoard[r][c].p as number;
-      const theoreticalBaseP = 1 - Math.pow(0.5, baseFlips); 
+      // const theoreticalBaseP = 1 - Math.pow(0.25, baseFlips); 
+      const theoreticalBaseP = calculateCellProbability(baseFlips, numCoins)
       
       if (theoreticalBaseP > 0 && theoreticalBaseP < 1) {
         // Calculate the scaling factor applied in fillBoardWithPs

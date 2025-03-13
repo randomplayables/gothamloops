@@ -17,7 +17,8 @@ const useGothamLoopsGame = () => {
     const [gameBoard, setGameBoard] = useState(
         initGame(
             LEVELS[DEFAULT_LEVEL].rows,
-            LEVELS[DEFAULT_LEVEL].cols
+            LEVELS[DEFAULT_LEVEL].cols,
+            LEVELS[DEFAULT_LEVEL].numCoins,
         )
     )
     
@@ -60,7 +61,7 @@ const useGothamLoopsGame = () => {
         setCurrentPosition({ row: centerRow, col: centerCol });
 
         setGameBoard(
-            initGame(currentLevel.rows, currentLevel.cols)
+            initGame(currentLevel.rows, currentLevel.cols, currentLevel.numCoins)
         )
     }, [currentLevel])
 
@@ -175,13 +176,15 @@ const useGothamLoopsGame = () => {
         // 5) Create a fresh board for the new round
         const newBoard = initGame(
           currentLevel.rows,
-          currentLevel.cols
+          currentLevel.cols,
+          currentLevel.numCoins
         );
       
         // 6) Apply updated probabilities using the *newPastCells* local variable
         const updatedBoard = updateProbabilitiesFromPastVisits(
           newBoard,
-          newPastCells // Pass the local variable, not the (stale) state
+          newPastCells, // Pass the local variable, not the (stale) state
+          currentLevel.numCoins
         );
         
         setGameBoard(updatedBoard);
