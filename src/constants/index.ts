@@ -13,21 +13,21 @@ export const CELL_NUMBERS_COLORS = [
 ]
 
 export const LEVELS = {
-  small: {
+  deuce: {
     rows: 11,
     cols: 11,
     numCoins: 2
   },
-  medium: {
+  trey: {
     rows: 15,
     cols: 15,
     numCoins: 3
   },
-  large: {
+  quad: {
     rows: 19,
     cols: 19,
     numCoins: 4
   },
 };
 
-export const DEFAULT_LEVEL: TLevel = 'small'
+export const DEFAULT_LEVEL: TLevel = 'deuce'
