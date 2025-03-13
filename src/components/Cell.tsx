@@ -14,7 +14,7 @@ const Cell = ({cell, rowIndex, cellIndex, handleCellLeftClick, level}: CellProps
     <div
         className={clsx(
             "cell",
-            level !== "easy" && "small"
+            level !== "small" && "smaller-cell"
         )}
             onClick={() => handleCellLeftClick(rowIndex, cellIndex)}
     >
