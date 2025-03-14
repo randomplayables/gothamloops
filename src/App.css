@@ -280,3 +280,43 @@ header {
   font-size: 0.9rem;
   opacity: 0.9;
 }
+
+.past-visit-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border-style: solid;
+  border-width: 3px; /* Make border thicker for visibility */
+  box-sizing: border-box;
+  pointer-events: none; /* Allow clicking through the rings */
+  z-index: 5; /* Below cell content but above background */
+  opacity: 0.8; /* Slightly more opaque for better visibility */
+}
+
+/* Add explicit size classes if the dynamic calculations don't work */
+.past-visit-ring:nth-of-type(1) {
+  width: 90%;
+  height: 90%;
+}
+
+.past-visit-ring:nth-of-type(2) {
+  width: 75%;
+  height: 75%;
+}
+
+.past-visit-ring:nth-of-type(3) {
+  width: 60%;
+  height: 60%;
+}
+
+.past-visit-ring:nth-of-type(4) {
+  width: 45%;
+  height: 45%;
+}
+
+.past-visit-ring:nth-of-type(5) {
+  width: 30%;
+  height: 30%;
+}

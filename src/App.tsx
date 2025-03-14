@@ -18,7 +18,8 @@ function App() {
     round,
     handleStartNewRound,
     isGameOver,
-    finalTotalScore} = useGothamLoopsGame()
+    finalTotalScore,
+    pastCells} = useGothamLoopsGame()
 
   return (
     <div className='game'>
@@ -40,6 +41,7 @@ function App() {
             level={level} 
             gameBoard={gameBoard} 
             handleCellLeftClick={handleCellLeftClick}
+            pastCells={pastCells}
           />
           <SelectLevel 
             level={level} 

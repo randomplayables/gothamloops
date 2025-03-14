@@ -1,5 +1,6 @@
 import clsx from "clsx"
-import { GameCell, TLevel } from "../types"
+import { GameCell, TLevel, PastCell } from "../types"
+import { ROUND_COLORS } from "../constants"
 
 type  CellProps = {
     cell: GameCell
@@ -7,9 +8,38 @@ type  CellProps = {
     cellIndex: number
     handleCellLeftClick: (row: number, col: number) => void
     level: TLevel
+    pastVisits: PastCell
 }
 
-const Cell = ({cell, rowIndex, cellIndex, handleCellLeftClick, level}: CellProps) => {
+const Cell = ({cell, rowIndex, cellIndex, handleCellLeftClick, level, pastVisits}: CellProps) => {
+
+    // Create an array of past rounds where this cell was visited
+    const visitedInRounds: number[] = [];
+
+    // Loop through past visits and collect the rounds
+    for (let i = 0; i < pastVisits.isOpen.length; i++) {
+        if (pastVisits.isOpen[i]) {
+            // If it was open in this past round, add the round number to our array
+            const round = pastVisits.round[i];
+            if (!visitedInRounds.includes(round)) {
+                visitedInRounds.push(round);
+            }
+        }
+    }
+
+    // Sort rounds from oldest to newest so outer rings are older rounds
+    visitedInRounds.sort((a, b) => a - b);
+
+    // // Create an array of rounds where this cell was open
+    // const openedRounds = pastVisits.isOpen
+    // .map((isOpen, index) => ({ isOpen, round: pastVisits.round[index] }))
+    // .filter(visit => visit.isOpen)
+    // .sort((a, b) => a.round - b.round) // Sort by round number
+    // .map(visit => visit.round);
+
+    // // Get unique round numbers to avoid duplicate rings
+    // const uniqueRounds = [...new Set(openedRounds)];
+
     return(
     <div
         className={clsx(
@@ -18,6 +48,30 @@ const Cell = ({cell, rowIndex, cellIndex, handleCellLeftClick, level}: CellProps
         )}
             onClick={() => handleCellLeftClick(rowIndex, cellIndex)}
     >
+
+        {/* Render rings for past visits from oldest (outer) to newest (inner) */}
+        {visitedInRounds.map((round, index) => {
+            // Calculate ring size - earlier rounds get larger rings
+            const ringSize = 90 - (index * 15);
+            
+            // Get color for this round (index 0 = round 1)
+            const colorIndex = (round - 1) % ROUND_COLORS.length;
+            const ringColor = ROUND_COLORS[colorIndex];
+            
+            return (
+                <div 
+                    key={`ring-${round}`} 
+                    className="past-visit-ring" 
+                    style={{
+                        borderColor: ringColor,
+                        width: `${ringSize}%`,
+                        height: `${ringSize}%`,
+                        zIndex: 5 - index, // Make sure outer rings don't cover inner rings
+                    }}
+                />
+            );
+        })}
+
         {cell.isOpen && cell.highlight === null &&  <div className="isO"></div>}
         {/* {cell.wasOpen && <div className="wasO"></div>}  */}
         {cell.isHome && cell.highlight !== "green" && <div className="home"></div>}
