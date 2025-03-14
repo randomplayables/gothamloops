@@ -285,8 +285,9 @@ const useGothamLoopsGame = () => {
         // Check if this cell has already been visited in this round
         const cellAlreadyVisitedThisRound = newGameBoard[row][col].isOpen  
         
-        // Always mark the cell as open      
+        // Always mark the cell as open and record the current round number    
         newGameBoard[row][col].isOpen = true 
+        newGameBoard[row][col].round = round;
     
         // Update current position
         setCurrentPosition({ row, col })
@@ -336,7 +337,7 @@ const useGothamLoopsGame = () => {
         }
     
         return newGameBoard
-    }, [currentPosition, isRoundOver, roundHistory.step, pastCells, currentLevel.rows, currentLevel.cols])
+    }, [currentPosition, isRoundOver, roundHistory.step, pastCells, currentLevel.rows, currentLevel.cols, round])
 
     const handleCellLeftClick = useCallback((row: number, col: number) => {
         if (isRoundOver) return null

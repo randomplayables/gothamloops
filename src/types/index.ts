@@ -10,7 +10,7 @@ type PresentCell = {
 }
 
 export type PastCell = {
-    isOpen: boolean[] //In earlier drafts this was wasOpen
+    isOpen: boolean[]
     round: number[]
     p: number[]
     isHome: boolean

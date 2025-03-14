@@ -71,8 +71,6 @@ const fillBoardWithPs = (emptyBoard: TBoard, rows: number, cols: number, numCoin
               const flips = maxsteps - stepdistance + 1;
               
               // Probability of getting at least one heads in 'flips' tries
-              // P(success) = 1 - P(all tails) = 1 - 0.5^flips
-              // cellP = 1 - Math.pow(0.25, flips);
               cellP = calculateCellProbability(flips, numCoins)
               
               // Ensure minimum probability of 0.1
@@ -103,8 +101,6 @@ export const updateProbabilitiesFromPastVisits = (
   // Calculate maxsteps (maximum distance from any corner to home)
   const maxsteps = centerRowIndex + centerCellIndex;
   
-  // // Calculate extra flips for each cell based on past visits
-  // const extraFlips: number[][] = Array(rows).fill(0).map(() => Array(cols).fill(0));
   // Create a map to track which rounds each cell has "extra flips" from
   // Using Sets to ensure we only count each round once
   const extraFlipsFromRounds: Set<number>[][] = Array(rows)
@@ -116,33 +112,6 @@ export const updateProbabilitiesFromPastVisits = (
 
   // Determine how many past rounds we have data for
   const numPastRounds = pastCells[0][0].isOpen.length;
-    
-  // // For each cell that was visited in past rounds
-  // for (let i = 0; i < rows; i++) {
-  //   for (let j = 0; j < cols; j++) {
-  //     // Count how many times this cell was visited
-  //     const visitCount = pastCells[i][j].isOpen.filter(Boolean).length;
-      
-  //     if (visitCount > 0) {
-  //       // For each cell on the board, calculate the extra flips based on distance
-  //       for (let r = 0; r < rows; r++) {
-  //         for (let c = 0; c < cols; c++) {
-  //           // Skip the home cell - it should always remain at maximum probability
-  //           if (gameBoard[r][c].isHome) continue;
-            
-  //           // Calculate Manhattan distance from the visited cell
-  //           const distance = Math.abs(r - i) + Math.abs(c - j);
-            
-  //           // Calculate extra flips based on distance
-  //           if (distance === 0 || distance === 1) {
-  //             // This is the visited cell itself and the neighboring cell - add 1 extra flip per visit
-  //             extraFlips[r][c] += visitCount;
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-  // }
 
   // For each past round (0-indexed, so round 1 is index 0)
   for (let round = 0; round < numPastRounds; round++) {
@@ -184,15 +153,11 @@ export const updateProbabilitiesFromPastVisits = (
       // Add the extra flips from unique past rounds
       const totalFlips = baseFlips + extraFlipsFromRounds[r][c].size;
       
-      // // Add the extra flips from past visits (rounded to nearest whole flip)
-      // const totalFlips = baseFlips + Math.round(extraFlips[r][c]);
-      
       // Calculate new probability using the coin-flipping model
       let newP = calculateCellProbability(totalFlips, numCoins)
       
       // Apply the same scaling factor as the original cell probability
-      const originalP = gameBoard[r][c].p as number;
-      // const theoreticalBaseP = 1 - Math.pow(0.25, baseFlips); 
+      const originalP = gameBoard[r][c].p as number; 
       const theoreticalBaseP = calculateCellProbability(baseFlips, numCoins)
       
       if (theoreticalBaseP > 0 && theoreticalBaseP < 1) {

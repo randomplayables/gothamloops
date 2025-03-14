@@ -30,16 +30,6 @@ const Cell = ({cell, rowIndex, cellIndex, handleCellLeftClick, level, pastVisits
     // Sort rounds from oldest to newest so outer rings are older rounds
     visitedInRounds.sort((a, b) => a - b);
 
-    // // Create an array of rounds where this cell was open
-    // const openedRounds = pastVisits.isOpen
-    // .map((isOpen, index) => ({ isOpen, round: pastVisits.round[index] }))
-    // .filter(visit => visit.isOpen)
-    // .sort((a, b) => a.round - b.round) // Sort by round number
-    // .map(visit => visit.round);
-
-    // // Get unique round numbers to avoid duplicate rings
-    // const uniqueRounds = [...new Set(openedRounds)];
-
     return(
     <div
         className={clsx(
@@ -73,7 +63,6 @@ const Cell = ({cell, rowIndex, cellIndex, handleCellLeftClick, level, pastVisits
         })}
 
         {cell.isOpen && cell.highlight === null &&  <div className="isO"></div>}
-        {/* {cell.wasOpen && <div className="wasO"></div>}  */}
         {cell.isHome && cell.highlight !== "green" && <div className="home"></div>}
         {!cell.place && <div className="empty-cell"></div>}
         {cell.place && <div className="on-place"></div>}

@@ -15,7 +15,6 @@ const Board = (props: Props) => {
         <div className="board">
         {gameBoard.map((row, rowIndex) => (
               <div className="row" key={`row-${rowIndex}`}>{row.map((cell, cellIndex) => (
-              // <div className="row">{row.map((cell, cellIndex) => (
                 <Cell
                 key={`cell-${rowIndex}-${cellIndex}`}
                 cell={cell}
