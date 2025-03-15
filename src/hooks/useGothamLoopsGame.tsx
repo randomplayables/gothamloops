@@ -237,7 +237,6 @@ const useGothamLoopsGame = () => {
             }
             return cells;
         });
-        // We'll handle the rest of the reset in the useEffect
     }, []);
 
     useEffect(() => {
