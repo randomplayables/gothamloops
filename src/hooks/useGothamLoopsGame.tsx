@@ -29,7 +29,8 @@ const useGothamLoopsGame = () => {
         step: 0,
         placeCell: [],
         p: [],
-        score: []
+        score: [],
+        rvalue: [] 
     });
     
     // Track the current position for faster lookup
@@ -52,7 +53,8 @@ const useGothamLoopsGame = () => {
             step: 0,
             placeCell: [],
             p: [],
-            score: []
+            score: [],
+            rvalue: []
         });
 
         // Reset the current position to the home (center) position of the new board
@@ -196,7 +198,8 @@ const useGothamLoopsGame = () => {
           step: 0,
           placeCell: [],
           p: [],
-          score: []
+          score: [],
+          rvalue: []
         });
       
         // 8) Reset the player’s position to the home cell
@@ -310,6 +313,7 @@ const useGothamLoopsGame = () => {
             placeCell: [...prev.placeCell, { row, cell: col }],
             p: [...prev.p, typeof cell.p === 'number' ? cell.p : 0],
             score: [...prev.score, moveScore],
+            rvalue: [...prev.rvalue, rvalue]
         }));
     
         // Calculate the new round score and update state
@@ -317,17 +321,18 @@ const useGothamLoopsGame = () => {
             return prev + moveScore;
         });
         
+        // Compute the random value once for this move
+        const rvalue: number = Math.random();
         if (cell.isHome) {
-            if (roundHistory.step > 0 && cell.isHome === true){
+            if (roundHistory.step > 0){
                 setIsRoundOver(true)
                 cell.highlight = "green"
             }
             console.log("This is your home")
         } else {
-            let rvalue: number = Math.random() 
+            console.log("rvalue: ", rvalue)
+            console.log("cell.p: ", cell.p)
             if (rvalue > (cell.p as number)){
-                console.log("rvalue: ", rvalue)
-                console.log("cell.p: ", cell.p)
                 setIsRoundOver(true)
                 cell.highlight = "red"
                 setRoundScore(0)

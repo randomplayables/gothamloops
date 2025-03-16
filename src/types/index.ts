@@ -23,6 +23,7 @@ export type TrackRound = {
     placeCell: { row: number, cell: number }[]
     p: number[]
     score: number[]
+    rvalue: number[]
 }
 
 export type MultiRoundTrack = {
