@@ -22,11 +22,11 @@ export const DEFAULT_LEVEL: TLevel = 'deuce'
 
 // Colors for marking cells that were visited in previous rounds
 export const ROUND_COLORS = [
-  '#FF5733', // Round 1: Red-Orange  
-  '#3357FF', // Round 2: Blue
-  '#33FF57', // Round 3: Green
-  '#FF33F5', // Round 4: Pink
-  '#F5FF33', // Round 5: Yellow
-  '#33FFF5', // Round 6: Cyan
-  '#FF8433', // Round 7: Orange
+  '#60D394', // Round 1: Emerald 
+  '#8AC926', // Round 2: Yellow green
+  '#6A4C93', // Round 3: Ultra violet
+  '#073B4C', // Round 4: Midnight green
+  '#8A716A', // Round 5: Cinereous
+  '#125E8A', // Round 6: Lapis Lazulli
+  '#D6CA98', // Round 7: Sage
 ];

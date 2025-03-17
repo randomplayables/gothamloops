@@ -9,13 +9,12 @@
   --cell-border-color: #bbb;
   --isopen: steelblue;
   --wasopen: blue;
-  --ishome: tomato;
-  --red: firebrick;
-  --green: green;
-
+  --ishome: #FF595E;
+  --red: #5A1807;
+  --green: #A7D49B;
   --btn-color: #151515;
   --btn-active: #555;
-  
+  --new-btn: #2C6E49;
   background-color: var(--app-bg);
   color: var(--text);
 

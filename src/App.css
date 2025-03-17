@@ -192,7 +192,7 @@ header {
 }
 
 .new-round-button {
-  background-color: #4CAF50;
+  background-color: var(--new-btn);
   color: white;
   border: none;
   padding: 8px 16px;
@@ -224,7 +224,7 @@ header {
 }
 
 .new-game-button {
-  background-color: #4CAF50;
+  background-color: var(--new-btn);
   color: white;
   border: none;
   padding: 12px 24px;
