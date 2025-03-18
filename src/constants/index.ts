@@ -27,6 +27,7 @@ export const ROUND_COLORS = [
   '#6A4C93', // Round 3: Ultra violet
   '#073B4C', // Round 4: Midnight green
   '#8A716A', // Round 5: Cinereous
-  '#125E8A', // Round 6: Lapis Lazulli
-  '#D6CA98', // Round 7: Sage
+  '#E5ECE9', // Round 6: Mint cream
+  '#BF8686', // Round 7: Old Rose
+  
 ];
