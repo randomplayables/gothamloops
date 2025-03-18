@@ -30,7 +30,11 @@ type  CellProps = {
 
 const Cell = ({cell, rowIndex, cellIndex, handleCellLeftClick, level, pastVisits}: CellProps) => {
 
-    // Create an array of past rounds where this cell was visited
+    /**
+     * Collect the rounds where this cell was previously visited.
+     * Used to render visual indicators for past visits.
+     * @type {number[]}
+     */
     const visitedInRounds: number[] = [];
 
     // Loop through past visits and collect the rounds
