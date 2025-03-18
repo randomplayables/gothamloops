@@ -1,3 +1,20 @@
+/**
+ * Cell component for Gotham Loops game.
+ * 
+ * Renders an individual cell in the game grid with appropriate visual states based on 
+ * cell properties. Displays rings for past visits, highlights for special states,
+ * and handles user interactions.
+ * 
+ * @component
+ * @param {Object} props - Component props
+ * @param {GameCell} props.cell - Current state data for this cell
+ * @param {number} props.rowIndex - Row position of this cell in the game board
+ * @param {number} props.cellIndex - Column position of this cell in the game board
+ * @param {Function} props.handleCellLeftClick - Callback function triggered when the cell is clicked
+ * @param {TLevel} props.level - Current difficulty level of the game ("deuce", "trey", or "quad")
+ * @param {PastCell} props.pastVisits - History of this cell's states across previous rounds
+ * @returns {JSX.Element} Rendered game cell with appropriate visual indicators
+ */
 import clsx from "clsx"
 import { GameCell, TLevel, PastCell } from "../types"
 import { ROUND_COLORS } from "../constants"

@@ -1,3 +1,17 @@
+/**
+ * Board component for Gotham Loops game.
+ * 
+ * Renders the game grid based on the current gameBoard state. Each cell in the grid
+ * is rendered as a Cell component which handles its own visual state and interactions.
+ * 
+ * @component
+ * @param {Object} props - Component props
+ * @param {TBoard} props.gameBoard - Two-dimensional array representing the current state of the game board
+ * @param {Function} props.handleCellLeftClick - Callback function triggered when a cell is clicked
+ * @param {TLevel} props.level - Current difficulty level of the game ("deuce", "trey", or "quad")
+ * @param {PastCell[][]} props.pastCells - Two-dimensional array containing the history of cell states across all rounds
+ * @returns {JSX.Element} Rendered game board with rows and cells
+ */
 import { TBoard, TLevel, PastCell } from "../types"
 import Cell from "./Cell"
 
