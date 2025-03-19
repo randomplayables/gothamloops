@@ -1,5 +1,23 @@
+/**
+ * Utility functions for Gotham Loops game.
+ * 
+ * This file contains core game logic functions that handle board creation,
+ * probability calculations, and scoring mechanisms that drive the game.
+ * 
+ * @module utils
+ */
 import { TBoard, PastCell } from "../types"
 
+/**
+ * Creates an empty game board with the specified dimensions.
+ * 
+ * Initializes a board where all cells have default properties.
+ * The center cell is designated as the home cell.
+ * 
+ * @param {number} rows - Number of rows in the board
+ * @param {number} cols - Number of columns in the board
+ * @returns {TBoard} A new board with initialized cells
+ */
 const createBoard = (rows: number, cols: number) => {
     const board: TBoard = []
 
@@ -29,21 +47,63 @@ const createBoard = (rows: number, cols: number) => {
     return board
 }
 
+/**
+ * Initializes a new game board with default cell probabilities.
+ * 
+ * Creates an empty board and fills it with appropriate probability values.
+ * 
+ * @param {number} rows - Number of rows in the board
+ * @param {number} cols - Number of columns in the board
+ * @param {number} numCoins - Number of coins used in probability calculations
+ * @returns {TBoard} A fully initialized game board
+ */
 export const initBoard = (rows: number, cols: number, numCoins: number) => {
     const emptyBoard = createBoard(rows, cols)
     const gameBoard = fillBoardWithPs(emptyBoard, rows, cols, numCoins)
     return gameBoard
 }
 
+/**
+ * Helper function to initialize a new game.
+ * 
+ * Wrapper around initBoard that creates a new game board.
+ * 
+ * @param {number} rows - Number of rows in the board
+ * @param {number} cols - Number of columns in the board
+ * @param {number} numCoins - Number of coins used in probability calculations
+ * @returns {TBoard} A fully initialized game board
+ */
 export const initGame = (rows: number, cols: number, numCoins: number) => {
     return initBoard(rows, cols, numCoins)
 }
 
+/**
+ * Calculates the probability for a cell based on coin flips.
+ * 
+ * Uses a probabilistic model based on coin flips to determine
+ * the likelihood of successfully traversing a cell.
+ * 
+ * @param {number} flips - Number of coin flips to simulate
+ * @param {number} numCoins - Number of coins used per flip
+ * @returns {number} Probability value between 0 and 1
+ */
 const calculateCellProbability = (flips: number, numCoins: number) => {
   const failurePerTrial = 1 - Math.pow(0.5, numCoins);
   return 1 - Math.pow(failurePerTrial, flips);
 }
 
+/**
+ * Fills a board with probability values based on distance from home.
+ * 
+ * Assigns probabilities to each cell based on Manhattan distance from
+ * the home cell. Cells closer to home have higher probabilities of success.
+ * 
+ * @param {TBoard} emptyBoard - The board to fill with probabilities
+ * @param {number} rows - Number of rows in the board
+ * @param {number} cols - Number of columns in the board
+ * @param {number} numCoins - Number of coins used in probability calculations
+ * @returns {TBoard} Board with assigned probability values
+ */
 const fillBoardWithPs = (emptyBoard: TBoard, rows: number, cols: number, numCoins: number) => {
   // Find the home cell (which should be at the center)
   const centerRowIndex = Math.floor(rows / 2);
@@ -84,6 +144,18 @@ const fillBoardWithPs = (emptyBoard: TBoard, rows: number, cols: number, numCoin
   return emptyBoard;
 }
 
+/**
+ * Updates cell probabilities based on past visits across rounds.
+ * 
+ * Increases the probability of success for cells that were visited in previous
+ * rounds or are neighbors of previously visited cells. This makes the game
+ * progressively more challenging as rounds advance.
+ * 
+ * @param {TBoard} gameBoard - Current game board
+ * @param {PastCell[][]} pastCells - History of cell states from past rounds
+ * @param {number} numCoins - Number of coins used in probability calculations
+ * @returns {TBoard} Updated board with adjusted probabilities
+ */
 export const updateProbabilitiesFromPastVisits = (
   gameBoard: TBoard,
   pastCells: PastCell[][],
@@ -174,6 +246,20 @@ export const updateProbabilitiesFromPastVisits = (
   return updatedBoard;
 }
 
+/**
+ * Calculates the score for a player's move to a specific cell.
+ * 
+ * Score is primarily based on distance from home, with penalties
+ * for visiting cells that were already visited in previous rounds.
+ * 
+ * @param {number} row - Row index of the cell
+ * @param {number} col - Column index of the cell
+ * @param {boolean} isHome - Whether this is the home cell
+ * @param {PastCell[][]} pastCells - History of cell states from past rounds
+ * @param {number} boardRows - Total number of rows in the board
+ * @param {number} boardCols - Total number of columns in the board
+ * @returns {number} The calculated score for this move
+ */
 export const calculateMoveScore = (
   row: number, 
   col: number, 

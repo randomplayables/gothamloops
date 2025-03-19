@@ -1,3 +1,16 @@
+/* 
+ * App.css - Component-specific styles for Gotham Loops
+ *
+ * This file contains all the component-specific styling for the Gotham Loops game.
+ * It defines the visual appearance of the game board, cells, controls, and UI elements
+ * that make up the game interface.
+ */
+
+/* 
+ * ==================== 
+ * ROOT CONTAINER
+ * ==================== 
+ */
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -5,16 +18,27 @@
   text-align: center;
 }
 
+/* 
+ * ==================== 
+ * GAME CONTAINER
+ * ==================== 
+ */
 .game {
   padding: 0.5rem 1.5rem;
   background-color: var(--surface);
   border-radius: 1rem;
 }
 
+/* 
+ * ==================== 
+ * BOARD LAYOUT
+ * ==================== 
+ */
 .row {
   display: flex
 }
 
+/* Cell base styling */
 .cell {
   --cell-size: 2rem;
   display: flex;
@@ -31,10 +55,18 @@
   box-sizing: border-box;
 }
 
+/* Smaller cell size for higher difficulty levels */
 .cell.smaller-cell {
   --cell-size: 1.5rem;
 }
 
+/* 
+ * ==================== 
+ * CELL STATES
+ * ==================== 
+ */
+
+/* Opened cell in current round */
 .isO {
   width: 100%;
   height: 100%;
@@ -47,6 +79,7 @@
   border-bottom-color: var(--isopen);
 }
 
+/* Home cell styling */
 .home {
   width: 100%;
   height: 100%;
@@ -59,6 +92,7 @@
   border-bottom-color: var(--ishome);
 }
 
+/* Current player position indicator */
 .cell.on-place {
   position: relative;
 }
@@ -71,6 +105,7 @@
   transform: translate(-50%, -50%);
 }
 
+/* Empty cell styling */
 .cell.empty-cell {
   position: relative;
 }
@@ -83,6 +118,13 @@
   transform: translate(-50%, -50%);
 }
 
+/* 
+ * ==================== 
+ * HIGHLIGHT STATES
+ * ==================== 
+ */
+
+/* Failure state (red highlight) */
 .red {
   width: 100%;
   height: 100%;
@@ -95,14 +137,15 @@
 }
 
 .red::after {
-  content: "*";       /* or something else */
-  color: #fff;        /* a contrasting color */
+  content: "*";
+  color: #fff;        /* Text contrast */
   position: absolute;
   top: 65%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
+/* Success state (green highlight) */
 .green {
   width: 100%;
   height: 100%;
@@ -123,6 +166,11 @@
   transform: translate(-50%, -50%);
 }
 
+/* 
+ * ==================== 
+ * LEVEL SELECTION
+ * ==================== 
+ */
 .select-level {
   display: flex;
   list-style-type: none;
@@ -150,6 +198,11 @@
   background-color: var(--btn-active);
 }
 
+/* 
+ * ==================== 
+ * BUTTONS & CONTROLS
+ * ==================== 
+ */
 button {
   background-color: var(--btn-color);
   color: var(--surface);
@@ -160,6 +213,11 @@ button {
   font-weight: 700;
 }
 
+/* 
+ * ==================== 
+ * HEADER & GAME STATUS
+ * ==================== 
+ */
 header {
   display: flex;
   justify-content: space-between;
@@ -206,6 +264,11 @@ header {
   background-color: #45a049;
 }
 
+/* 
+ * ==================== 
+ * FINAL SCORE SCREEN
+ * ==================== 
+ */
 .final-score-container {
   display: flex;
   flex-direction: column;
@@ -250,6 +313,11 @@ header {
   opacity: 0.9;
 }
 
+/* 
+ * ==================== 
+ * PAST VISIT INDICATORS
+ * ==================== 
+ */
 .past-visit-ring {
   position: absolute;
   top: 50%;
