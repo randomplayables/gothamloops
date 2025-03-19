@@ -1,29 +1,57 @@
+/* 
+ * index.css - Global styles and CSS variables for Gotham Loops
+ *
+ * This file defines the core styling variables and base styles used throughout
+ * the game. It establishes the color palette, typography, and basic layout
+ * settings that create a consistent visual foundation.
+ */
+
+/* 
+ * ==================== 
+ * ROOT VARIABLES & GLOBAL SETTINGS
+ * ==================== 
+ */
 :root {
+   /* Typography settings */
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  --app-bg: #151515;
-  --text: #1a1a1a;
-  --surface: #ccc;
-  --cell-border-color: #bbb;
-  --isopen: steelblue;
-  --wasopen: blue;
-  --ishome: #FF595E;
-  --red: #5A1807;
-  --green: #A7D49B;
-  --btn-color: #151515;
-  --btn-active: #555;
-  --new-btn: #2C6E49;
+  /* Color palette */
+  --app-bg: #151515;         /* Dark background for the application container */
+  --text: #1a1a1a;           /* Primary text color */
+  --surface: #ccc;           /* Surface/card background color */
+  --cell-border-color: #bbb; /* Border color for grid cells */
+
+  /* Game state indicators */
+  --isopen: steelblue;       /* Cell visited in current round */
+  --ishome: #FF595E;         /* Home/center cell indicator */
+  --red: #5A1807;            /* Failure state highlight */
+  --green: #A7D49B;          /* Success state highlight */
+
+  /* UI element colors */
+  --btn-color: #151515;      /* Default button color */
+  --btn-active: #555;        /* Active/selected button state */
+  --new-btn: #2C6E49;        /* New game/round button color */
+
+   /* Set the app background */
   background-color: var(--app-bg);
   color: var(--text);
 
+  /* Text rendering optimizations */
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* 
+ * ==================== 
+ * BASE ELEMENT STYLING
+ * ==================== 
+ */
+
+ /* Body element positioning and dimensions */
 body {
   margin: 0;
   display: flex;
