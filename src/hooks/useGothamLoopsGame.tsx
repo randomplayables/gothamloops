@@ -1,3 +1,31 @@
+/**
+ * Custom hook that manages the core game logic for Gotham Loops.
+ * 
+ * This hook encapsulates the entire game state and logic, including:
+ * - Board state management
+ * - Level selection
+ * - Round progression
+ * - Score calculation
+ * - Player movement
+ * - Game over detection
+ * - History tracking across rounds
+ * 
+ * @returns {Object} Game state and control functions
+ * @returns {string} returns.level - Current difficulty level ("deuce", "trey", or "quad")
+ * @returns {Function} returns.changeLevel - Function to change the game difficulty
+ * @returns {TBoard} returns.gameBoard - Current state of the game board
+ * @returns {Function} returns.handleCellLeftClick - Function to handle cell clicks
+ * @returns {TrackRound} returns.roundHistory - Data tracking the current round's history
+ * @returns {boolean} returns.isRoundOver - Whether the current round has ended
+ * @returns {number} returns.roundScore - Score for the current round
+ * @returns {number} returns.totalScore - Accumulated score across all rounds
+ * @returns {number} returns.round - Current round number
+ * @returns {Function} returns.handleStartNewRound - Function to start a new round
+ * @returns {PastCell[][]} returns.pastCells - History of all cells across previous rounds
+ * @returns {MultiRoundTrack} returns.multiRoundTrack - Data tracking all rounds played
+ * @returns {boolean} returns.isGameOver - Whether the game has ended
+ * @returns {number} returns.finalTotalScore - Final score at game completion
+ */
 import { useCallback, useEffect, useState, useRef } from "react"
 import { initGame, updateProbabilitiesFromPastVisits, calculateMoveScore } from "../utils"
 import { TBoard, TrackRound, TLevel, PastCell, MultiRoundTrack } from "../types";
@@ -46,6 +74,12 @@ const useGothamLoopsGame = () => {
     const [isGameOver, setIsGameOver] = useState(false);
     const [finalTotalScore, setFinalTotalScore] = useState(0);
 
+    /**
+     * Resets the game board to a fresh state.
+     * 
+     * Clears the current round data and initializes a new board
+     * according to the current level settings.
+     */
     const resetBoard = useCallback(() => {
         setIsRoundOver(false)
         setRoundScore(0)
@@ -67,6 +101,12 @@ const useGothamLoopsGame = () => {
         )
     }, [currentLevel])
 
+    /**
+     * Starts a completely new game.
+     * 
+     * Resets all game state including the board, round number,
+     * and clears multi-round tracking data.
+     */
     const startNewGame = useCallback(() => {
         resetBoard();
         resetRound(); // Reset round counter for new game
@@ -124,7 +164,13 @@ const useGothamLoopsGame = () => {
         rounds: []
     });
 
-    // Update the startNewRound function to save current round data:
+    /**
+     * Starts a new round or ends the game after 7 rounds.
+     * 
+     * Updates the board with probability adjustments based on previous rounds,
+     * saves the current round data to history, and prepares for the next round.
+     * If all 7 rounds are completed, calculates the final score and ends the game.
+     */
     const startNewRound = useCallback(() => {
         
         // Check if we're about to exceed 7 rounds
@@ -218,6 +264,14 @@ const useGothamLoopsGame = () => {
         roundScore
       ]);
       
+    /**
+     * Changes the game difficulty level.
+     * 
+     * Updates the level state and reinitializes the game board
+     * and past cell tracking for the new level dimensions.
+     * 
+     * @param {TLevel} selectedLevel - The new difficulty level to set
+     */  
     const changeLevel = useCallback((selectedLevel: TLevel) => {
         setLevel(selectedLevel);
         // Reset pastCells when the level changes
@@ -252,13 +306,36 @@ const useGothamLoopsGame = () => {
         }
     }, [level, startNewGame])
 
-    // Check if a move is legal (adjacent to current position)
+    /**
+     * Checks if a move from one cell to another is legal.
+     * 
+     * A legal move is to an adjacent cell (up, down, left, or right).
+     * Diagonal moves are not allowed.
+     * 
+     * @param {number} fromRow - Starting row position
+     * @param {number} fromCol - Starting column position
+     * @param {number} toRow - Target row position
+     * @param {number} toCol - Target column position
+     * @returns {boolean} Whether the move is legal
+     */
     const isLegalMove = (fromRow: number, fromCol: number, toRow: number, toCol: number) => {
         const rowDiff = Math.abs(fromRow - toRow)
         const colDiff = Math.abs(fromCol - toCol)
         return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1)
     }
 
+    /**
+     * Handles the logic when a player opens a cell.
+     * 
+     * Updates the game state based on the player's move to a new cell,
+     * including calculating scores, checking for round completion,
+     * and applying probability checks.
+     * 
+     * @param {TBoard} board - Current game board
+     * @param {number} row - Row of the cell being opened
+     * @param {number} col - Column of the cell being opened
+     * @returns {TBoard|null} Updated board or null if the move is invalid
+     */
     const openCell = useCallback((board: TBoard, row: number, col: number) => {
         // Make a deep copy so that we don't mutate the original board
         const newGameBoard: TBoard = JSON.parse(JSON.stringify(board))
@@ -343,6 +420,16 @@ const useGothamLoopsGame = () => {
         return newGameBoard
     }, [currentPosition, isRoundOver, roundHistory.step, pastCells, currentLevel.rows, currentLevel.cols, round])
 
+    /**
+     * Handles player clicks on cells.
+     * 
+     * Processes the player's attempt to move to a new cell,
+     * updates the game board if the move is valid.
+     * 
+     * @param {number} row - Row of the clicked cell
+     * @param {number} col - Column of the clicked cell
+     * @returns {null} Returns null if the move is invalid
+     */
     const handleCellLeftClick = useCallback((row: number, col: number) => {
         if (isRoundOver) return null
 
@@ -354,7 +441,12 @@ const useGothamLoopsGame = () => {
         }  
     }, [isRoundOver, gameBoard, openCell])
 
-    // Function to handle starting a new round (for UI to call)
+    /**
+     * Handles UI request to start a new round.
+     * 
+     * Acts as a wrapper for the startNewRound function
+     * that is called from UI components.
+     */
     const handleStartNewRound = useCallback(() => {
         if (isRoundOver) {
             startNewRound()
