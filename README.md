@@ -8,7 +8,7 @@ In Gotham Loops, each cell on the grid has a probability value that determines y
 
 To succeed, you'll need to carefully balance risk and reward while creating efficient routes through the grid.
 
-![Gotham Loops Gameplay](https://placeholder-for-game-screenshot.png)
+![Gotham Loops Gameplay](./public/gothamloops_shot.png)
 
 ## Features
 
@@ -47,7 +47,7 @@ To succeed, you'll need to carefully balance risk and reward while creating effi
    - Score is based on the Manhattan distance from home (how many steps away).
    - Visiting cells farther from home earns more points.
    - Revisiting cells you've already been to in the current round earns no additional points.
-   - Visiting cells you've been to in previous rounds grants reduced points.
+   - Revisiting cells you've been to in previous rounds grants reduced points.
 
 5. **Round Ending**:
    - A round ends when either:
@@ -58,7 +58,7 @@ To succeed, you'll need to carefully balance risk and reward while creating effi
 
 6. **Multi-Round Strategy**:
    - After each round, the cells you visited and the adjacent cells become less risky in subsequent rounds.
-   - Also after each round, the cells you visited become less valuable to revisit.
+   - Also after each round, the cells you visited become less valuable to revisit but adjacent cells retain their value.
    - Your total score accumulates across all seven rounds.
 
 7. **Game Completion**:
@@ -76,14 +76,13 @@ To succeed, you'll need to carefully balance risk and reward while creating effi
 
 ### Materials Needed
 
-- Grid paper with:
+- Grid with:
   - 13×13 grid for "Deuce" difficulty
   - 17×17 grid for "Trey" difficulty
   - 21×21 grid for "Quad" difficulty
-- Pencil
+- Pen
 - 2-4 coins (depending on difficulty)
-- Colored markers or highlighters (at least 7 different colors)
-- Calculator (optional)
+- Colored pens
 
 ### Setup
 
@@ -99,47 +98,41 @@ To succeed, you'll need to carefully balance risk and reward while creating effi
 1. **Starting the Game**:
    - Begin at the home cell in the center of the grid.
    - You'll play for a total of 7 rounds.
+   - Pick a unique color to represent each round
 
 2. **Moving**:
    - On each turn, move to an adjacent cell (up, down, left, or right).
+   - Put a ring around the cell's dot using the round's color
    - Diagonal moves are not allowed.
 
 3. **Probability Check**:
    - When entering a new cell, perform a probability check:
-     - Flip your coins (2, 3, or 4 depending on difficulty).
-     - Success: If at least one coin shows heads, you successfully enter the cell.
-     - Failure: If all coins show tails, you fail and end the round with 0 points.
-   
-4. **Calculating Cell Probabilities** (for reference):
-   - The base number of "flips" for a cell = (maximum distance from corner to home) - (cell's distance from home) + 1
-   - Probability of success = 1 - (1 - 0.5^numCoins)^flips
-   - Home cell always has 100% success rate
+     - Number of coin flips (2, 3, or 4 coins depending on difficulty) allowed (call this number dC) is the Manhattan distance to the closest corner plus 1 plus the sum of the number of unique rings in a cell from previous rounds for each adjacent cell (SURCA)
+       - dC = |row_distance from closest corner| + |column_distance from closest corner| + 1 + SURCA
+     - Start flipping your coins (2, 3, or 4 coins depending on difficulty) .
+       - Success: If you obtain a flip with all heads in dC or fewer flips, you successfully enter the cell.
+       - Failure: If each of your allowed dc flips contains a tails, the you fail to enter the cell successfully.
 
-5. **Scoring**:
-   - Each time you successfully enter a new cell, score points equal to its Manhattan distance from home.
-   - Manhattan distance = |row_distance| + |column_distance|
+4. **Scoring**:
+   - Each time you successfully enter a new cell, score points (call this score dH) equal to its Manhattan distance from home minus the number of unique ring colors from previous rounds (URC) in the cell.
+     - dH = |row_distance from home| + |column_distance from home| - unique ring colors
    - No points for revisiting cells in the same round.
-   - -1 point penalty for visiting cells you've been to in previous rounds.
 
-6. **Ending a Round**:
+5. **Ending a Round**:
    - Round ends when you either:
      - Return to the home cell (success)
      - Fail a probability check (0 points for that round)
-   - Mark all visited cells in this round with the current round's color.
-
-7. **Next Rounds**:
-   - When starting a new round, all previously visited cells become riskier.
-   - For each cell that you or its neighbors visited in previous rounds, add extra "flips" to improve its success chance.
 
 ### Scoring Example
 
-- Home is at coordinates (6,6) in a 13×13 grid
-- Moving to cell (6,7) = 1 point (distance of 1)
-- Moving to cell (6,8) = 2 points (distance of 2)
-- Moving to cell (7,8) = 3 points (distance of 3)
-- Moving to cell (7,7) = 2 points (distance of 2)
-- Moving to cell (7,6) = 1 point (distance of 1)
-- Moving to cell (6,6) = 0 points (home cell)
+- Round 1:
+  - Home is at coordinates (6,6) in a 13×13 grid
+  - Moving to cell (6,7) = 1 point (distance of 1)
+  - Moving to cell (6,8) = 2 points (distance of 2)
+  - Moving to cell (7,8) = 3 points (distance of 3)
+  - Moving to cell (7,7) = 2 points (distance of 2)
+  - Moving to cell (7,6) = 1 point (distance of 1)
+  - Moving to cell (6,6) = 0 points (home cell)
 
 Total score for this round: 9 points
 
@@ -147,9 +140,8 @@ Total score for this round: 9 points
 
 1. **Risk Management**: Balance exploring far cells (high points) with the risk of failure.
 2. **Path Planning**: Create efficient routes that maximize distance while minimizing risk.
-3. **Round Progression**: Early rounds are good for exploration, while later rounds require more caution.
-4. **Return Home**: Don't forget to return to the home cell to secure your points for the round.
-5. **Pattern Recognition**: Notice how probabilities change across rounds and adapt your strategy.
+3. **Return Home**: Don't forget to return to the home cell to secure your points for the round.
+4. **Pattern Recognition**: Notice how probabilities and points change across rounds and adapt your strategy.
 
 ## Development
 
