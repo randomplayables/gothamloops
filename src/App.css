@@ -269,7 +269,7 @@ header {
  * FINAL SCORE SCREEN
  * ==================== 
  */
-.final-score-container {
+/* .final-score-container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -280,6 +280,150 @@ header {
 
 .final-score {
   margin: 2rem 0;
+  padding: 1rem 2rem;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.new-game-button {
+  background-color: var(--new-btn);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+}
+
+.new-game-button:hover {
+  background-color: #45a049;
+} */
+
+/* 
+ * ==================== 
+ * FINAL SCORE OVERLAY
+ * ==================== 
+ */
+ /* .final-score-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 100;
+}
+
+.final-score-container {
+  background-color: var(--surface);
+  border-radius: 1rem;
+  padding: 2rem;
+  max-width: 80%;
+  max-height: 80%;
+  overflow: auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.final-score {
+  margin: 2rem 0;
+  padding: 1rem 2rem;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.new-game-button {
+  background-color: var(--new-btn);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+}
+
+.new-game-button:hover {
+  background-color: #45a049;
+} */
+
+/* 
+ * ==================== 
+ * FINAL SCORE OVERLAY
+ * ==================== 
+ */
+ .final-score-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  pointer-events: none; /* Allow clicking through the overlay */
+}
+
+.final-score-container {
+  background-color: var(--surface);
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto; /* Make the container clickable */
+  max-width: 80%;
+  user-select: none; /* Prevent text selection during drag */
+}
+
+.final-score-container.dragging {
+  opacity: 0.9;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+  transition: box-shadow 0.2s, opacity 0.2s;
+}
+
+.drag-handle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background-color: var(--new-btn);
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.drag-instructions {
+  color: white;
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
+.final-score {
+  margin: 1.5rem 0;
   padding: 1rem 2rem;
   background-color: #f0f0f0;
   border-radius: 8px;

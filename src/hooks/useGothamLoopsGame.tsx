@@ -169,91 +169,118 @@ const useGothamLoopsGame = () => {
      * 
      * Updates the board with probability adjustments based on previous rounds,
      * saves the current round data to history, and prepares for the next round.
-     * If all 7 rounds are completed, calculates the final score and ends the game.
+     * If all 7 rounds are completed, calculates the final score and ends the game
+     * after updating the board to show Round 7 rings.
      */
     const startNewRound = useCallback(() => {
         
-        // Check if we're about to exceed 7 rounds
-        if (round >= 7) {
-            // Calculate final total score from multiRoundTrack
-            const totalScore = multiRoundTrack.rounds.reduce((sum, roundData) => 
-            sum + roundData.finalScore, 0) + roundScore;
-            
-            setFinalTotalScore(totalScore);
-            setIsGameOver(true);
-            return; // Don't start a new round
-        }
-
         // Add the current round score to the total score if the round wasn't lost
         if (roundScore > 0) {
             setTotalScore(prevTotal => prevTotal + roundScore);
         }
 
-        // 1) Increment the round right away, so round is about to become (oldRound + 1).
-        incrementRound();
-      
-        // 2) Build a fresh copy of `pastCells` from the current gameBoard
+        // 1) Build a fresh copy of `pastCells` from the current gameBoard
         const newPastCells = structuredClone(pastCells);
         for (let i = 0; i < gameBoard.length; i++) {
-          for (let j = 0; j < gameBoard[i].length; j++) {
+        for (let j = 0; j < gameBoard[i].length; j++) {
             const cell = gameBoard[i][j];
             if ("isOpen" in cell) {
-              newPastCells[i][j].isOpen.push(cell.isOpen as boolean);
-              newPastCells[i][j].round.push(cell.round as number);
-              newPastCells[i][j].p.push(cell.p as number);
-              newPastCells[i][j].place.push(cell.place as boolean);
-              newPastCells[i][j].highlight?.push(cell.highlight as "red" | "green");
+            newPastCells[i][j].isOpen.push(cell.isOpen as boolean);
+            newPastCells[i][j].round.push(cell.round as number);
+            newPastCells[i][j].p.push(cell.p as number);
+            newPastCells[i][j].place.push(cell.place as boolean);
+            newPastCells[i][j].highlight?.push(cell.highlight as "red" | "green");
             }
-          }
+        }
         }
         console.log("Updated pastCells:", newPastCells);
-      
-        // 3) Build the new multiRoundTrack entry
+    
+        // 2) Build the new multiRoundTrack entry
         const newMultiRoundTrack = structuredClone(multiRoundTrack);
         newMultiRoundTrack.rounds.push({
-          roundNumber: round,           // This is the *old* round number just completed
-          roundHistory: { ...roundHistory },
-          finalScore: roundScore
+        roundNumber: round,           // This is the *old* round number just completed
+        roundHistory: { ...roundHistory },
+        finalScore: roundScore
         });
         console.log("Updated multiRoundTrack:", newMultiRoundTrack);
-      
-        // 4) Now actually set the updated states for pastCells and multiRoundTrack
+    
+        // 3) Now actually set the updated states for pastCells and multiRoundTrack
         setPastCells(newPastCells);
         setMultiRoundTrack(newMultiRoundTrack);
-      
+        
+        // Check if we're about to exceed 7 rounds
+        if (round >= 7) {
+            // Calculate final total score from multiRoundTrack
+            const totalScore = newMultiRoundTrack.rounds.reduce((sum, roundData) => 
+            sum + roundData.finalScore, 0);
+            
+            // Update the game board to show the Round 7 rings first
+            
+            // Reset the current position to the home cell
+            const centerRow = Math.floor(currentLevel.rows / 2);
+            const centerCol = Math.floor(currentLevel.cols / 2);
+            setCurrentPosition({ row: centerRow, col: centerCol });
+            
+            // Create a copy of the game board to show completed Round 7
+            const finalBoard = structuredClone(gameBoard);
+            
+            // Update the board to ensure all steelblue markers are gone
+            for (let i = 0; i < finalBoard.length; i++) {
+                for (let j = 0; j < finalBoard[i].length; j++) {
+                    const cell = finalBoard[i][j];
+                    if (cell.isOpen) {
+                        cell.isOpen = false; // Remove steelblue markers
+                    }
+                }
+            }
+            
+            setGameBoard(finalBoard);
+            setFinalTotalScore(totalScore);
+            
+            // Set game over after a brief delay to allow the board to update visually
+            setTimeout(() => {
+                setIsGameOver(true);
+            }, 100);
+            
+            return; // Don't start a new round
+        }
+
+        // 4) Increment the round now that we're starting a new round
+        incrementRound();
+    
         // 5) Create a fresh board for the new round
         const newBoard = initGame(
-          currentLevel.rows,
-          currentLevel.cols,
-          currentLevel.numCoins
+        currentLevel.rows,
+        currentLevel.cols,
+        currentLevel.numCoins
         );
-      
+    
         // 6) Apply updated probabilities using the *newPastCells* local variable
         const updatedBoard = updateProbabilitiesFromPastVisits(
-          newBoard,
-          newPastCells, // Pass the local variable, not the (stale) state
-          currentLevel.numCoins
+        newBoard,
+        newPastCells, // Pass the local variable, not the (stale) state
+        currentLevel.numCoins
         );
         
         setGameBoard(updatedBoard);
-      
+    
         // 7) Reset round-related state
         setIsRoundOver(false);
         setRoundScore(0);
         setRoundHistory({
-          step: 0,
-          placeCell: [],
-          p: [],
-          score: [],
-          rvalue: []
+        step: 0,
+        placeCell: [],
+        p: [],
+        score: [],
+        rvalue: []
         });
-      
-        // 8) Reset the player’s position to the home cell
+    
+        // 8) Reset the player's position to the home cell
         const centerRow = Math.floor(currentLevel.rows / 2);
         const centerCol = Math.floor(currentLevel.cols / 2);
         setCurrentPosition({ row: centerRow, col: centerCol });
-      
-      }, [
+    
+    }, [
         round,
         incrementRound,
         currentLevel,
@@ -262,7 +289,7 @@ const useGothamLoopsGame = () => {
         multiRoundTrack,
         roundHistory,
         roundScore
-      ]);
+    ]);
       
     /**
      * Changes the game difficulty level.

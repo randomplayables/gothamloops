@@ -1,8 +1,8 @@
 /**
  * Main App component for Gotham Loops game.
  * 
- * This is the root component that orchestrates the game's UI. It renders either
- * the active game interface or the final score screen depending on game state.
+ * This is the root component that orchestrates the game's UI. It renders the
+ * active game interface and overlays the draggable final score screen when the game ends.
  * Uses the useGothamLoopsGame custom hook to manage all game logic and state.
  * 
  * @component
@@ -40,31 +40,31 @@ function App() {
 
   return (
     <div className='game'>
-      {isGameOver ? (
+      {/* Always render the game board and controls */}
+      <Header 
+        isRoundOver={isRoundOver} 
+        roundScore={roundScore} 
+        totalScore={totalScore}
+        round={round}
+        onStartNewRound={handleStartNewRound}
+      />
+      <Board 
+        level={level} 
+        gameBoard={gameBoard} 
+        handleCellLeftClick={handleCellLeftClick}
+        pastCells={pastCells}
+      />
+      <SelectLevel 
+        level={level} 
+        changeLevel={changeLevel}
+      />
+      
+      {/* Conditionally render the draggable final score overlay */}
+      {isGameOver && (
         <FinalScore 
           finalTotalScore={finalTotalScore} 
           onStartNewGame={() => window.location.reload()} 
         />
-      ) : (
-        <>
-          <Header 
-            isRoundOver={isRoundOver} 
-            roundScore={roundScore} 
-            totalScore={totalScore}
-            round={round}
-            onStartNewRound={handleStartNewRound}
-          />
-          <Board 
-            level={level} 
-            gameBoard={gameBoard} 
-            handleCellLeftClick={handleCellLeftClick}
-            pastCells={pastCells}
-          />
-          <SelectLevel 
-            level={level} 
-            changeLevel={changeLevel}
-          />
-        </>
       )}
     </div>
   )
