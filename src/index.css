@@ -25,7 +25,7 @@
 
   /* Game state indicators */
   --isopen: steelblue;       /* Cell visited in current round */
-  --ishome: #FF595E;         /* Home/center cell indicator */
+  --ishome: #FF595E;         /* Home center cell indicator */
   --red: #5A1807;            /* Failure state highlight */
   --green: #A7D49B;          /* Success state highlight */
 
