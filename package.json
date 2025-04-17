@@ -1,8 +1,12 @@
 {
-  "name": "gothamloops",
-  "private": true,
-  "version": "0.0.0",
+  "name": "@randomplayables/gothamloops",
+  "private": false,
+  "version": "0.0.1",
   "type": "module",
+  "repository": "https://github.com/randomplayables/gothamloops.git",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
