@@ -280,14 +280,10 @@ export const calculateMoveScore = (
   
   // Base score is directly proportional to distance from home
   let score = distanceFromHome;
-  
-  // Check if cell was visited in any previous round
-  const wasVisitedPreviously = pastCells[row][col].isOpen.some(Boolean);
-  
-  // Apply penalty for previously visited cells
-  if (wasVisitedPreviously) {
-    score = Math.max(0, score - 1); // Subtract 1, but don't go below 0
-  }
+
+  // subtract one point per prior visit
+  const visitCount = pastCells[row][col].isOpen.filter(v => v).length;
+  score = Math.max(0, score - visitCount);
   
   return score;
 };
