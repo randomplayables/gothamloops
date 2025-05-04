@@ -4,10 +4,10 @@
  * Handles session management and data storage
  */
 
-// Base URL for the RandomPlayables API
+// Base URL for the RandomPlayables API - update with EC2 public IP
 const API_BASE_URL = process.env.NODE_ENV === 'production' 
   ? 'https://randomplayables.com/api'
-  : 'http://localhost:3000/api';
+  : 'http://54.67.39.91:3000/api';  // Use your EC2 public IP
 
 // Game ID for Gotham Loops
 const GAME_ID = 'gotham-loops';
@@ -34,6 +34,7 @@ export async function initGameSession() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ gameId: GAME_ID }),
+      mode: 'cors',  // Explicitly set CORS mode
     });
     
     if (!response.ok) {
@@ -73,7 +74,10 @@ export async function initGameSession() {
  */
 async function verifySession(sessionId: string) {
   try {
-    const response = await fetch(`${API_BASE_URL}/game-session?sessionId=${sessionId}`);
+    const response = await fetch(`${API_BASE_URL}/game-session?sessionId=${sessionId}`, {
+      method: 'GET',
+      mode: 'cors',  // Explicitly set CORS mode
+    });
     return response.ok;
   } catch (error) {
     console.error('Error verifying session:', error);
@@ -115,6 +119,7 @@ export async function saveGameData(roundNumber: number, roundData: any) {
       headers: {
         'Content-Type': 'application/json',
       },
+      mode: 'cors',  // Explicitly set CORS mode
       body: JSON.stringify({
         sessionId: session.sessionId,
         roundNumber,
