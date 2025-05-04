@@ -31,6 +31,7 @@ import { initGame, updateProbabilitiesFromPastVisits, calculateMoveScore } from 
 import { TBoard, TrackRound, TLevel, PastCell, MultiRoundTrack } from "../types";
 import { DEFAULT_LEVEL, LEVELS } from "../constants";
 import useRound from "./useRound"; 
+import { initGameSession, saveGameData } from "../services/apiService";
 
 const useGothamLoopsGame = () => {
     // Use the round hook with memoized functions
@@ -53,6 +54,7 @@ const useGothamLoopsGame = () => {
     const [isRoundOver, setIsRoundOver] = useState(false)
     const [roundScore, setRoundScore] = useState(0)
     const [totalScore, setTotalScore] = useState(0)
+    const [gameSession, setGameSession] = useState<any>(null);
     const [roundHistory, setRoundHistory] = useState<TrackRound>({
         step: 0,
         placeCell: [],
@@ -60,6 +62,17 @@ const useGothamLoopsGame = () => {
         score: [],
         rvalue: [] 
     });
+
+    // Add an effect to initialize the session when the game starts
+    useEffect(() => {
+        const initSession = async () => {
+            const session = await initGameSession();
+            setGameSession(session);
+        }
+        ;
+        initSession();
+    }, []);
+  
     
     // Track the current position for faster lookup
     const [currentPosition, setCurrentPosition] = useState(() => {
@@ -172,124 +185,312 @@ const useGothamLoopsGame = () => {
      * If all 7 rounds are completed, calculates the final score and ends the game
      * after updating the board to show Round 7 rings.
      */
-    const startNewRound = useCallback(() => {
+//     const startNewRound = useCallback(() => {
         
-        // Add the current round score to the total score if the round wasn't lost
-        if (roundScore > 0) {
-            setTotalScore(prevTotal => prevTotal + roundScore);
-        }
+//         // Add the current round score to the total score if the round wasn't lost
+//         if (roundScore > 0) {
+//             setTotalScore(prevTotal => prevTotal + roundScore);
+//         }
 
-        // 1) Build a fresh copy of `pastCells` from the current gameBoard
-        const newPastCells = structuredClone(pastCells);
-        for (let i = 0; i < gameBoard.length; i++) {
+//         // 1) Build a fresh copy of `pastCells` from the current gameBoard
+//         const newPastCells = structuredClone(pastCells);
+//         for (let i = 0; i < gameBoard.length; i++) {
+//         for (let j = 0; j < gameBoard[i].length; j++) {
+//             const cell = gameBoard[i][j];
+//             if ("isOpen" in cell) {
+//             newPastCells[i][j].isOpen.push(cell.isOpen as boolean);
+//             newPastCells[i][j].round.push(cell.round as number);
+//             newPastCells[i][j].p.push(cell.p as number);
+//             newPastCells[i][j].place.push(cell.place as boolean);
+//             newPastCells[i][j].highlight?.push(cell.highlight as "red" | "green");
+//             }
+//         }
+//         }
+//         console.log("Updated pastCells:", newPastCells);
+    
+//         // 2) Build the new multiRoundTrack entry
+//         const newMultiRoundTrack = structuredClone(multiRoundTrack);
+//         newMultiRoundTrack.rounds.push({
+//         roundNumber: round,           // This is the *old* round number just completed
+//         roundHistory: { ...roundHistory },
+//         finalScore: roundScore
+//         });
+//         console.log("Updated multiRoundTrack:", newMultiRoundTrack);
+    
+//         // 3) Now actually set the updated states for pastCells and multiRoundTrack
+//         setPastCells(newPastCells);
+//         setMultiRoundTrack(newMultiRoundTrack);
+
+//           // After updating pastCells and multiRoundTrack, save the current round data
+//           if (round > 0 && gameSession) { // Skip saving for initial round=0 state
+//             const roundDataToSave = {
+//                 roundNumber: round,
+//                 finalScore: roundScore,
+//                 roundHistory: { ...roundHistory },
+//                 boardSize: {
+//                     rows: currentLevel.rows,
+//                     cols: currentLevel.cols
+//                 },
+//                 difficulty: level,
+//                 success: roundScore > 0 // Whether the round was completed successfully
+//             };
+
+//              // Save the data to the RandomPlayables platform
+//              await saveGameData(round, roundDataToSave);
+// }
+        
+//         // // Check if we're about to exceed 7 rounds
+//         // if (round >= 7) {
+//         //     // Calculate final total score from multiRoundTrack
+//         //     const totalScore = newMultiRoundTrack.rounds.reduce((sum, roundData) => 
+//         //     sum + roundData.finalScore, 0);
+            
+//         //     // Update the game board to show the Round 7 rings first
+            
+//         //     // Reset the current position to the home cell
+//         //     const centerRow = Math.floor(currentLevel.rows / 2);
+//         //     const centerCol = Math.floor(currentLevel.cols / 2);
+//         //     setCurrentPosition({ row: centerRow, col: centerCol });
+            
+//         //     // Create a copy of the game board to show completed Round 7
+//         //     const finalBoard = structuredClone(gameBoard);
+            
+//         //     // Update the board to ensure all steelblue markers are gone
+//         //     for (let i = 0; i < finalBoard.length; i++) {
+//         //         for (let j = 0; j < finalBoard[i].length; j++) {
+//         //             const cell = finalBoard[i][j];
+//         //             if (cell.isOpen) {
+//         //                 cell.isOpen = false; // Remove steelblue markers
+//         //             }
+//         //         }
+//         //     }
+            
+//         //     setGameBoard(finalBoard);
+//         //     setFinalTotalScore(totalScore);
+            
+//         //     // Set game over after a brief delay to allow the board to update visually
+//         //     setTimeout(() => {
+//         //         setIsGameOver(true);
+//         //     }, 100);
+            
+//         //     return; // Don't start a new round
+//         // }
+//         // Also update the game over section to save the final game data
+//         // // In the "if (round >= 7)" block within startNewRound
+//         if (round >= 7) {
+            
+//         // Calculate final total score from multiRoundTrack
+//         const totalScore = newMultiRoundTrack.rounds.reduce((sum, roundData) => 
+//             sum + roundData.finalScore, 0);
+        
+//         // Save final game data
+//         if (gameSession) {
+//             const finalGameData = {
+//                 totalScore,
+//                 allRounds: newMultiRoundTrack.rounds,
+//                 difficulty: level,
+//                 success: true,
+//                 gameCompleted: true
+//             };
+            
+//         await saveGameData(8, finalGameData); // Use round 8 for final game data
+//         }
+
+
+//         // 4) Increment the round now that we're starting a new round
+//         incrementRound();
+    
+//         // 5) Create a fresh board for the new round
+//         const newBoard = initGame(
+//         currentLevel.rows,
+//         currentLevel.cols,
+//         currentLevel.numCoins
+//         );
+    
+//         // 6) Apply updated probabilities using the *newPastCells* local variable
+//         const updatedBoard = updateProbabilitiesFromPastVisits(
+//         newBoard,
+//         newPastCells, // Pass the local variable, not the (stale) state
+//         currentLevel.numCoins
+//         );
+        
+//         setGameBoard(updatedBoard);
+    
+//         // 7) Reset round-related state
+//         setIsRoundOver(false);
+//         setRoundScore(0);
+//         setRoundHistory({
+//         step: 0,
+//         placeCell: [],
+//         p: [],
+//         score: [],
+//         rvalue: []
+//         });
+    
+//         // 8) Reset the player's position to the home cell
+//         const centerRow = Math.floor(currentLevel.rows / 2);
+//         const centerCol = Math.floor(currentLevel.cols / 2);
+//         setCurrentPosition({ row: centerRow, col: centerCol });
+    
+//     }, [
+//         round,
+//         incrementRound,
+//         currentLevel,
+//         gameBoard,
+//         pastCells,
+//         multiRoundTrack,
+//         roundHistory,
+//         roundScore,
+//         gameSession // Add gameSession to dependencies
+//     ]);
+
+const startNewRound = useCallback(async () => {
+    // Add the current round score to the total score if the round wasn't lost
+    if (roundScore > 0) {
+        setTotalScore(prevTotal => prevTotal + roundScore);
+    }
+
+    // 1) Build a fresh copy of `pastCells` from the current gameBoard
+    const newPastCells = structuredClone(pastCells);
+    for (let i = 0; i < gameBoard.length; i++) {
         for (let j = 0; j < gameBoard[i].length; j++) {
             const cell = gameBoard[i][j];
             if ("isOpen" in cell) {
-            newPastCells[i][j].isOpen.push(cell.isOpen as boolean);
-            newPastCells[i][j].round.push(cell.round as number);
-            newPastCells[i][j].p.push(cell.p as number);
-            newPastCells[i][j].place.push(cell.place as boolean);
-            newPastCells[i][j].highlight?.push(cell.highlight as "red" | "green");
+                newPastCells[i][j].isOpen.push(cell.isOpen as boolean);
+                newPastCells[i][j].round.push(cell.round as number);
+                newPastCells[i][j].p.push(cell.p as number);
+                newPastCells[i][j].place.push(cell.place as boolean);
+                newPastCells[i][j].highlight?.push(cell.highlight as "red" | "green");
             }
         }
-        }
-        console.log("Updated pastCells:", newPastCells);
-    
-        // 2) Build the new multiRoundTrack entry
-        const newMultiRoundTrack = structuredClone(multiRoundTrack);
-        newMultiRoundTrack.rounds.push({
+    }
+    console.log("Updated pastCells:", newPastCells);
+
+    // 2) Build the new multiRoundTrack entry
+    const newMultiRoundTrack = structuredClone(multiRoundTrack);
+    newMultiRoundTrack.rounds.push({
         roundNumber: round,           // This is the *old* round number just completed
         roundHistory: { ...roundHistory },
         finalScore: roundScore
-        });
-        console.log("Updated multiRoundTrack:", newMultiRoundTrack);
+    });
+    console.log("Updated multiRoundTrack:", newMultiRoundTrack);
+
+    // 3) Now actually set the updated states for pastCells and multiRoundTrack
+    setPastCells(newPastCells);
+    setMultiRoundTrack(newMultiRoundTrack);
+
+    // After updating pastCells and multiRoundTrack, save the current round data
+    if (round > 0 && gameSession) { // Skip saving for initial round=0 state
+        const roundDataToSave = {
+            roundNumber: round,
+            finalScore: roundScore,
+            roundHistory: { ...roundHistory },
+            boardSize: {
+                rows: currentLevel.rows,
+                cols: currentLevel.cols
+            },
+            difficulty: level,
+            success: roundScore > 0 // Whether the round was completed successfully
+        };
+
+        // Save the data to the RandomPlayables platform
+        await saveGameData(round, roundDataToSave);
+    }
     
-        // 3) Now actually set the updated states for pastCells and multiRoundTrack
-        setPastCells(newPastCells);
-        setMultiRoundTrack(newMultiRoundTrack);
-        
-        // Check if we're about to exceed 7 rounds
-        if (round >= 7) {
-            // Calculate final total score from multiRoundTrack
-            const totalScore = newMultiRoundTrack.rounds.reduce((sum, roundData) => 
+    // Check if we're about to exceed 7 rounds
+    if (round >= 7) {
+        // Calculate final total score from multiRoundTrack
+        const totalScore = newMultiRoundTrack.rounds.reduce((sum, roundData) => 
             sum + roundData.finalScore, 0);
+        
+        // Save final game data
+        if (gameSession) {
+            const finalGameData = {
+                totalScore,
+                allRounds: newMultiRoundTrack.rounds,
+                difficulty: level,
+                success: true,
+                gameCompleted: true
+            };
             
-            // Update the game board to show the Round 7 rings first
-            
-            // Reset the current position to the home cell
-            const centerRow = Math.floor(currentLevel.rows / 2);
-            const centerCol = Math.floor(currentLevel.cols / 2);
-            setCurrentPosition({ row: centerRow, col: centerCol });
-            
-            // Create a copy of the game board to show completed Round 7
-            const finalBoard = structuredClone(gameBoard);
-            
-            // Update the board to ensure all steelblue markers are gone
-            for (let i = 0; i < finalBoard.length; i++) {
-                for (let j = 0; j < finalBoard[i].length; j++) {
-                    const cell = finalBoard[i][j];
-                    if (cell.isOpen) {
-                        cell.isOpen = false; // Remove steelblue markers
-                    }
+            await saveGameData(8, finalGameData); // Use round 8 for final game data
+        }
+        
+        // Reset the current position to the home cell
+        const centerRow = Math.floor(currentLevel.rows / 2);
+        const centerCol = Math.floor(currentLevel.cols / 2);
+        setCurrentPosition({ row: centerRow, col: centerCol });
+        
+        // Create a copy of the game board to show completed Round 7
+        const finalBoard = structuredClone(gameBoard);
+        
+        // Update the board to ensure all steelblue markers are gone
+        for (let i = 0; i < finalBoard.length; i++) {
+            for (let j = 0; j < finalBoard[i].length; j++) {
+                const cell = finalBoard[i][j];
+                if (cell.isOpen) {
+                    cell.isOpen = false; // Remove steelblue markers
                 }
             }
-            
-            setGameBoard(finalBoard);
-            setFinalTotalScore(totalScore);
-            
-            // Set game over after a brief delay to allow the board to update visually
-            setTimeout(() => {
-                setIsGameOver(true);
-            }, 100);
-            
-            return; // Don't start a new round
         }
+        
+        setGameBoard(finalBoard);
+        setFinalTotalScore(totalScore);
+        
+        // Set game over after a brief delay to allow the board to update visually
+        setTimeout(() => {
+            setIsGameOver(true);
+        }, 100);
+        
+        return; // Don't start a new round
+    }
 
-        // 4) Increment the round now that we're starting a new round
-        incrementRound();
-    
-        // 5) Create a fresh board for the new round
-        const newBoard = initGame(
+    // 4) Increment the round now that we're starting a new round
+    incrementRound();
+
+    // 5) Create a fresh board for the new round
+    const newBoard = initGame(
         currentLevel.rows,
         currentLevel.cols,
         currentLevel.numCoins
-        );
-    
-        // 6) Apply updated probabilities using the *newPastCells* local variable
-        const updatedBoard = updateProbabilitiesFromPastVisits(
+    );
+
+    // 6) Apply updated probabilities using the *newPastCells* local variable
+    const updatedBoard = updateProbabilitiesFromPastVisits(
         newBoard,
         newPastCells, // Pass the local variable, not the (stale) state
         currentLevel.numCoins
-        );
-        
-        setGameBoard(updatedBoard);
+    );
     
-        // 7) Reset round-related state
-        setIsRoundOver(false);
-        setRoundScore(0);
-        setRoundHistory({
+    setGameBoard(updatedBoard);
+
+    // 7) Reset round-related state
+    setIsRoundOver(false);
+    setRoundScore(0);
+    setRoundHistory({
         step: 0,
         placeCell: [],
         p: [],
         score: [],
         rvalue: []
-        });
-    
-        // 8) Reset the player's position to the home cell
-        const centerRow = Math.floor(currentLevel.rows / 2);
-        const centerCol = Math.floor(currentLevel.cols / 2);
-        setCurrentPosition({ row: centerRow, col: centerCol });
-    
-    }, [
-        round,
-        incrementRound,
-        currentLevel,
-        gameBoard,
-        pastCells,
-        multiRoundTrack,
-        roundHistory,
-        roundScore
-    ]);
+    });
+
+    // 8) Reset the player's position to the home cell
+    const centerRow = Math.floor(currentLevel.rows / 2);
+    const centerCol = Math.floor(currentLevel.cols / 2);
+    setCurrentPosition({ row: centerRow, col: centerCol });
+}, [
+    round,
+    incrementRound,
+    currentLevel,
+    gameBoard,
+    pastCells,
+    multiRoundTrack,
+    roundHistory,
+    roundScore,
+    gameSession,
+    level // Add level to dependencies
+]);
       
     /**
      * Changes the game difficulty level.
@@ -474,9 +675,9 @@ const useGothamLoopsGame = () => {
      * Acts as a wrapper for the startNewRound function
      * that is called from UI components.
      */
-    const handleStartNewRound = useCallback(() => {
+    const handleStartNewRound = useCallback(async () => {
         if (isRoundOver) {
-            startNewRound()
+            await startNewRound()
         }
     }, [isRoundOver, startNewRound])
 
