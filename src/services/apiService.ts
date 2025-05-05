@@ -7,7 +7,7 @@
 // Base URL for the RandomPlayables API - update with EC2 public IP
 const API_BASE_URL = process.env.NODE_ENV === 'production' 
   ? 'https://randomplayables.com/api'
-  : 'http://54.67.39.91:3000/api';  // Use your EC2 public IP
+  : 'http://172.31.12.157:3000/api';
 
 // Game ID for Gotham Loops
 const GAME_ID = 'gotham-loops';
