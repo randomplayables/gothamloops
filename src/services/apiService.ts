@@ -1,13 +1,13 @@
-// src/services/apiService.ts
 /**
  * API Service for connecting with RandomPlayables platform
  * Handles session management and data storage
  */
 
-// Base URL for the RandomPlayables API - update with EC2 public IP
-const API_BASE_URL = process.env.NODE_ENV === 'production' 
+// Update the base URL to use environment variable
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 
+  (process.env.NODE_ENV === 'production' 
   ? 'https://randomplayables.com/api'
-  : 'http://172.31.12.157:3000/api';
+  : 'http://172.31.12.157:3000/api');
 
 // Game ID for Gotham Loops
 const GAME_ID = 'gotham-loops';
@@ -35,6 +35,7 @@ export async function initGameSession() {
       },
       body: JSON.stringify({ gameId: GAME_ID }),
       mode: 'cors',  // Explicitly set CORS mode
+      credentials: 'omit'  // Don't send cookies for cross-origin requests
     });
     
     if (!response.ok) {
@@ -67,6 +68,7 @@ export async function initGameSession() {
   }
 }
 
+
 /**
  * Verifies if a session is still valid
  * @param sessionId Session ID to verify
@@ -77,6 +79,7 @@ async function verifySession(sessionId: string) {
     const response = await fetch(`${API_BASE_URL}/game-session?sessionId=${sessionId}`, {
       method: 'GET',
       mode: 'cors',  // Explicitly set CORS mode
+      credentials: 'omit'  // Don't send cookies for cross-origin requests
     });
     return response.ok;
   } catch (error) {
@@ -120,6 +123,7 @@ export async function saveGameData(roundNumber: number, roundData: any) {
         'Content-Type': 'application/json',
       },
       mode: 'cors',  // Explicitly set CORS mode
+      credentials: 'omit',  // Don't send cookies for cross-origin requests
       body: JSON.stringify({
         sessionId: session.sessionId,
         roundNumber,
