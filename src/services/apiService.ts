@@ -18,6 +18,27 @@ const GAME_ID = 'gotham-loops';
 const SESSION_STORAGE_KEY = 'gameSession';
 const SESSION_CREATION_TIME_KEY = 'gameSessionCreationTime';
 
+// Extract authentication data from URL if present
+function getAuthFromURL() {
+  if (typeof window === 'undefined') return { token: null, userId: null };
+  
+  // Get the full URL including hash parameters
+  const fullUrl = window.location.href;
+  console.log("Checking URL for auth params:", fullUrl);
+  
+  // Parse URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const authToken = urlParams.get('authToken');
+  const userId = urlParams.get('userId');
+  
+  console.log("Auth params extracted:", 
+    authToken ? "Token present" : "No token", 
+    userId || "No userId"
+  );
+  
+  return { token: authToken, userId };
+}
+
 // We use a Promise to ensure multiple simultaneous calls wait for the same result
 let sessionInitPromise: Promise<any> | null = null;
 
@@ -56,24 +77,40 @@ export async function initGameSession() {
       // Remove any existing session data
       localStorage.removeItem(SESSION_STORAGE_KEY);
       
+      // Get authentication from URL if available
+      const { token, userId } = getAuthFromURL();
+      
       // Create a new session
       console.log("Initializing new game session with platform...");
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      
+      // Add authentication token if available
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
+      // Important: Modified to use 'omit' for credentials to avoid CORS issues
+      // while still passing the userId directly in the request body
       const response = await fetch(`${API_BASE_URL}/game-session`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ gameId: GAME_ID }),
+        headers,
+        body: JSON.stringify({ 
+          gameId: GAME_ID,
+          // Pass userId from URL directly in request body as fallback mechanism
+          ...(userId ? { passedUserId: userId } : {})
+        }),
         mode: 'cors',
-        credentials: 'omit'
+        credentials: 'omit'  // Changed from 'include' to 'omit' to avoid CORS issues
       });
       
       if (!response.ok) {
         console.warn(`Could not connect to RandomPlayables platform. Status: ${response.status}. Using local session.`);
         const localSession = {
           sessionId: `local-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-          userId: null,
-          isGuest: true,
+          userId: userId || null,  // Use userId from URL if available
+          isGuest: !userId,
           gameId: GAME_ID
         };
         
@@ -92,11 +129,15 @@ export async function initGameSession() {
       return session;
     } catch (error) {
       console.error('Error initializing game session:', error);
+      
+      // Get authentication from URL for fallback
+      const { userId } = getAuthFromURL();
+      
       // Fallback to local session
       const localSession = {
         sessionId: `local-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-        userId: null,
-        isGuest: true,
+        userId: userId || null,  // Use userId from URL if available
+        isGuest: !userId,
         gameId: GAME_ID
       };
       
@@ -147,19 +188,32 @@ export async function saveGameData(roundNumber: number, roundData: any) {
       return { success: true, offline: true };
     }
     
-    // Send data to the server
+    // Get authentication from URL if available
+    const { token, userId } = getAuthFromURL();
+    
+    // Prepare headers
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    
+    // Add authentication token if available
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    // Send data to the server - using 'omit' for credentials to avoid CORS issues
     console.log(`Sending data to ${API_BASE_URL}/game-data`);
     const response = await fetch(`${API_BASE_URL}/game-data`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      mode: 'cors',  // Explicitly set CORS mode
-      credentials: 'omit',  // Don't send cookies for cross-origin requests
+      headers,
+      mode: 'cors',  
+      credentials: 'omit',  // Changed from 'include' to 'omit' to avoid CORS issues
       body: JSON.stringify({
         sessionId: session.sessionId,
         roundNumber,
-        roundData
+        roundData,
+        // Also pass userId directly in the request body as fallback
+        ...(userId ? { passedUserId: userId } : {})
       }),
     });
     
