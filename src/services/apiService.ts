@@ -20,7 +20,7 @@ const SESSION_CREATION_TIME_KEY = 'gameSessionCreationTime';
 
 // Extract authentication data from URL if present
 function getAuthFromURL() {
-  if (typeof window === 'undefined') return { token: null, userId: null };
+  if (typeof window === 'undefined') return { token: null, userId: null, username: null };
   
   // Get the full URL including hash parameters
   const fullUrl = window.location.href;
@@ -30,13 +30,15 @@ function getAuthFromURL() {
   const urlParams = new URLSearchParams(window.location.search);
   const authToken = urlParams.get('authToken');
   const userId = urlParams.get('userId');
+  const username = urlParams.get('username');
   
   console.log("Auth params extracted:", 
     authToken ? "Token present" : "No token", 
-    userId || "No userId"
+    userId || "No userId",
+    username || "No username"
   );
   
-  return { token: authToken, userId };
+  return { token: authToken, userId, username };
 }
 
 // We use a Promise to ensure multiple simultaneous calls wait for the same result
@@ -78,7 +80,7 @@ export async function initGameSession() {
       localStorage.removeItem(SESSION_STORAGE_KEY);
       
       // Get authentication from URL if available
-      const { token, userId } = getAuthFromURL();
+      const { token, userId, username } = getAuthFromURL();
       
       // Create a new session
       console.log("Initializing new game session with platform...");
@@ -98,8 +100,9 @@ export async function initGameSession() {
         headers,
         body: JSON.stringify({ 
           gameId: GAME_ID,
-          // Pass userId from URL directly in request body as fallback mechanism
-          ...(userId ? { passedUserId: userId } : {})
+          // Pass userId and username from URL directly in request body as fallback mechanism
+          ...(userId ? { passedUserId: userId } : {}),
+          ...(username ? { passedUsername: username } : {})
         }),
         mode: 'cors',
         credentials: 'omit'  // Changed from 'include' to 'omit' to avoid CORS issues
@@ -110,6 +113,7 @@ export async function initGameSession() {
         const localSession = {
           sessionId: `local-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
           userId: userId || null,  // Use userId from URL if available
+          username: username || null, // Use username from URL if available
           isGuest: !userId,
           gameId: GAME_ID
         };
@@ -131,12 +135,13 @@ export async function initGameSession() {
       console.error('Error initializing game session:', error);
       
       // Get authentication from URL for fallback
-      const { userId } = getAuthFromURL();
+      const { userId, username } = getAuthFromURL();
       
       // Fallback to local session
       const localSession = {
         sessionId: `local-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
         userId: userId || null,  // Use userId from URL if available
+        username: username || null, // Use username from URL if available
         isGuest: !userId,
         gameId: GAME_ID
       };
@@ -189,7 +194,7 @@ export async function saveGameData(roundNumber: number, roundData: any) {
     }
     
     // Get authentication from URL if available
-    const { token, userId } = getAuthFromURL();
+    const { token, userId, username } = getAuthFromURL();
     
     // Prepare headers
     const headers: Record<string, string> = {
@@ -212,8 +217,9 @@ export async function saveGameData(roundNumber: number, roundData: any) {
         sessionId: session.sessionId,
         roundNumber,
         roundData,
-        // Also pass userId directly in the request body as fallback
-        ...(userId ? { passedUserId: userId } : {})
+        // Also pass userId and username directly in the request body as fallback
+        ...(userId ? { passedUserId: userId } : {}),
+        ...(username ? { passedUsername: username } : {})
       }),
     });
     
