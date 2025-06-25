@@ -3,16 +3,15 @@
  * Handles session management and data storage
  */
 
-// Update the base URL to use environment variable
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 
-  (process.env.NODE_ENV === 'production' 
+// This now correctly uses the proxy for development and a real URL for production
+const API_BASE_URL = process.env.NODE_ENV === 'production'
   ? 'https://randomplayables.com/api'
-  : 'http://172.31.12.157:3000/api');
+  : '/api';
 
 console.log("Using API base URL:", API_BASE_URL);
 
 // Game ID for Gotham Loops
-const GAME_ID = 'gotham-loops';
+const GAME_ID = import.meta.env.VITE_GAME_ID;
 
 // Session storage keys
 const SESSION_STORAGE_KEY = 'gameSession';
@@ -104,8 +103,7 @@ export async function initGameSession() {
           ...(userId ? { passedUserId: userId } : {}),
           ...(username ? { passedUsername: username } : {})
         }),
-        mode: 'cors',
-        credentials: 'omit'  // Changed from 'include' to 'omit' to avoid CORS issues
+        credentials: 'include' // Can be 'include' now because proxy makes it a same-origin request
       });
       
       if (!response.ok) {
@@ -211,8 +209,7 @@ export async function saveGameData(roundNumber: number, roundData: any) {
     const response = await fetch(`${API_BASE_URL}/game-data`, {
       method: 'POST',
       headers,
-      mode: 'cors',  
-      credentials: 'omit',  // Changed from 'include' to 'omit' to avoid CORS issues
+      credentials: 'include',
       body: JSON.stringify({
         sessionId: session.sessionId,
         roundNumber,
